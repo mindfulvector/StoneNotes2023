@@ -5,4 +5,6 @@ __history
 tests\Win32
 tests\Win64
 *.log
-Support/*
+Support/*.zip
+Support/Hiawatha/*
+__recovery

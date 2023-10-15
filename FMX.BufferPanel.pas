@@ -185,8 +185,6 @@ begin
     TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com');
   end;
 
-  // Expand for different components based on command.
-
   FCommandEdit.SelectAll;
 
   Resize;

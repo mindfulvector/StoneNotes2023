@@ -3,7 +3,7 @@ unit SplitterSerializer;
 interface
 
 uses
-  FMX.BufferPanel, FMX.SplitterPanel, System.Rtti, System.JSON;
+  System.Classes, FMX.Controls, FMX.Types, FMX.BufferPanel, FMX.SplitterPanel, System.Rtti, System.JSON;
 
 type
   TSerializedSplitter = class
@@ -18,7 +18,7 @@ type
 
     function ToString: string;
     function FromString(const AJSONStr: string): TSerializedSplitter;
-    function CreateSplitter: TSplitterPanel;
+    function CreateSplitter(AOwner: TFMXObject): TSplitterPanel;
 
   end;
 
@@ -132,36 +132,38 @@ begin
   Result := Self;
 end;
 
-function TSerializedSplitter.CreateSplitter: TSplitterPanel;
+function TSerializedSplitter.CreateSplitter(AOwner: TFMXObject): TSplitterPanel;
 var
   buffer: TBufferPanel;
 begin
-  Result := TSplitterPanel.Create(nil); // Parent can be set later when adding to another control
+  Result := TSplitterPanel.Create(AOwner); // Parent can be set later when adding to another control
+  Result.Parent := AOwner;
   Result.SplitDirection := SplitDirection;
   Result.SplitterPosition := SplitterPosition;
 
   // Create Left Child
   if LeftControl is TSerializedSplitter then
-    Result.SetLeftControl(TSerializedSplitter(LeftControl).CreateSplitter)
+    Result.SetLeftControl(TSerializedSplitter(LeftControl).CreateSplitter(Result))
   else if LeftControl is TSerializedBuffer then
   begin
     buffer := TBufferPanel.Create(Result);
+    Result.SetLeftControl(buffer);
     buffer.SetBufferID(TSerializedBuffer(LeftControl).BufferID);
     buffer.SetCommand(TSerializedBuffer(LeftControl).CommandType);
     buffer.SetProperties(TSerializedBuffer(LeftControl).Properties);
-    Result.SetLeftControl(buffer);
   end;
 
   // Create Right Child
   if RightControl is TSerializedSplitter then
-    Result.SetRightControl(TSerializedSplitter(RightControl).CreateSplitter)
+    Result.SetRightControl(TSerializedSplitter(RightControl).CreateSplitter(Result))
   else if RightControl is TSerializedBuffer then
   begin
     buffer := TBufferPanel.Create(Result);
+    Result.SetRightControl(buffer);
     buffer.SetBufferID(TSerializedBuffer(RightControl).BufferID);
     buffer.SetCommand(TSerializedBuffer(RightControl).CommandType);
     buffer.SetProperties(TSerializedBuffer(RightControl).Properties);
-    Result.SetRightControl(buffer);
+
   end;
 end;
 

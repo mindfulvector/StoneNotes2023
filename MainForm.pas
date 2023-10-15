@@ -52,7 +52,7 @@ begin
     FSplitterPanel.DisposeOf;
     FSplitterPanel := nil;
     serializer := TSerializedSplitter.Create.FromString(data);
-    FSplitterPanel := serializer.CreateSplitter;
+    FSplitterPanel := serializer.CreateSplitter(Self);
     FSplitterPanel.Parent := Self;
     FLastSplitterRight := FSplitterPanel;
     FLastSplitterLeft := FSplitterPanel;

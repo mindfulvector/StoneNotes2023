@@ -5,3 +5,4 @@ __history
 tests\Win32
 tests\Win64
 *.log
+Support/*

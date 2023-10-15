@@ -1,0 +1,7 @@
+*.dcu
+Win32
+Win64
+__history
+tests\Win32
+tests\Win64
+*.log

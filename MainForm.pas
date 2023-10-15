@@ -7,7 +7,7 @@ uses
   FMX.Graphics, FMX.Dialogs, FMX.SplitterPanel, FMX.Controls.Presentation,
   FMX.Edit, FMX.StdCtrls, FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics,
   FMX.TMSFNCGraphicsTypes, FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser, SplitterSerializer,
-  System.IOUtils;
+  System.IOUtils, PluginManager, Logger;
 
 type
   TfrmStoneNotes = class(TForm)
@@ -23,10 +23,12 @@ type
     procedure btnSplitLeftClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
+    procedure FormDeactivate(Sender: TObject);
   private
     FSplitterPanel: TSplitterPanel;
     FLastSplitterRight: TSplitterPanel;
     FLastSplitterLeft: TSplitterPanel;
+    FPluginManager: TPluginManager;
   public
     { Public declarations }
   end;
@@ -89,6 +91,8 @@ begin
 end;
 
 procedure TfrmStoneNotes.FormCreate(Sender: TObject);
+var
+  PluginCount: integer;
 begin
   FSplitterPanel := TSplitterPanel.Create(Self);
   FSplitterPanel.Parent := Self;
@@ -97,6 +101,21 @@ begin
   FLastSplitterRight := FSplitterPanel;
   FLastSplitterLeft := FSplitterPanel;
   Resize;
+
+  FPluginManager := TPluginManager.Create;
+  PluginCount := FPluginManager.LoadPlugins;
+  if PluginCount = 0 then
+  begin
+    ShowMessage('Warning: no plugins loaded! Please reinstall StoneNotes to restore complete functionality.');
+  end else begin
+    Logger.Log(Format('Loaded %d plugins.', [PluginCount]));
+  end;
+
+end;
+
+procedure TfrmStoneNotes.FormDeactivate(Sender: TObject);
+begin
+  Logger.FlushLogBuffer;
 end;
 
 procedure TfrmStoneNotes.FormResize(Sender: TObject);

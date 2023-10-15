@@ -6,17 +6,23 @@
     <Transaction>2023/03/14 02:01:39.000.819,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2023/03/14 02:48:15.000.116,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
     <Transaction>2023/05/09 16:58:29.000.104,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2023/10/14 17:22:05.250,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2023/10/14 17:22:15.530,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
-    <Transaction>2023/10/14 17:23:46.208,D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.BufferPanel.pas=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
-    <Transaction>2023/10/14 17:24:00.173,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
-    <Transaction>2023/10/14 17:24:00.173,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2023/10/14 17:24:03.691,D:\Dev\Projects\Embar\Projects\StoneNotes\StoneNotes.dproj=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
-    <Transaction>2023/10/14 17:26:42.366,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/10/14 17:27:00.221,D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.SplitterPanel.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/10/14 17:27:44.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.fmx=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx</Transaction>
-    <Transaction>2023/10/14 17:27:44.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
-    <Transaction>2023/10/14 19:58:49.825,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
-    <Transaction>2023/10/14 19:59:33.912,D:\Dev\Projects\Embar\Projects\StoneNotes\SplitterSerializer.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/14 17:22:05.000.250,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/10/14 17:22:15.000.530,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2023/10/14 17:23:46.000.208,C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.BufferPanel.pas</Transaction>
+    <Transaction>2023/10/14 17:24:00.000.173,C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/14 17:24:00.000.173,C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.fmx=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx</Transaction>
+    <Transaction>2023/10/14 17:24:03.000.691,C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Dev\Projects\Embar\Projects\StoneNotes\StoneNotes.dproj</Transaction>
+    <Transaction>2023/10/14 17:26:42.000.366,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
+    <Transaction>2023/10/14 17:27:00.000.221,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.SplitterPanel.pas</Transaction>
+    <Transaction>2023/10/14 17:27:44.000.857,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.pas</Transaction>
+    <Transaction>2023/10/14 17:27:44.000.857,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx=D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.fmx</Transaction>
+    <Transaction>2023/10/14 19:58:49.000.825,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/14 19:59:33.000.912,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\SplitterSerializer.pas</Transaction>
+    <Transaction>2023/10/15 12:06:15.557,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/15 12:06:53.485,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/15 12:07:12.772,D:\Dev\Projects\Embar\Projects\StoneNotes\PluginManager.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/15 12:15:18.379,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/15 12:15:26.598,D:\Dev\Projects\Embar\Projects\StoneNotes\HighPerfLogger.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/15 12:19:13.533,D:\Dev\Projects\Embar\Projects\StoneNotes\Logger.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\HighPerfLogger.pas</Transaction>
   </Transactions>
 </BorlandProject>

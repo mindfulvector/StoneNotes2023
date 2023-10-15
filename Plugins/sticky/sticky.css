@@ -1,0 +1,10 @@
+.sticky-note {
+    position: absolute;
+    padding: 10px;
+    background-color: #ffeb3b;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    resize: both;
+    overflow: auto;
+    font-family: Arial, sans-serif;
+    border-radius: 5px;
+}

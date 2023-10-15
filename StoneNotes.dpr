@@ -5,7 +5,8 @@ uses
   FMX.Forms,
   MainForm in 'MainForm.pas' {frmStoneNotes},
   FMX.BufferPanel in 'FMX.BufferPanel.pas',
-  FMX.SplitterPanel in 'FMX.SplitterPanel.pas';
+  FMX.SplitterPanel in 'FMX.SplitterPanel.pas',
+  SplitterSerializer in 'SplitterSerializer.pas';
 
 {$R *.res}
 

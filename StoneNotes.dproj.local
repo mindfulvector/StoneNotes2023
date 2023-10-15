@@ -9,12 +9,14 @@
     <Transaction>2023/10/14 17:22:05.250,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2023/10/14 17:22:15.530,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
     <Transaction>2023/10/14 17:23:46.208,D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.BufferPanel.pas=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
-    <Transaction>2023/10/14 17:24:00.173,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2023/10/14 17:24:00.173,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
+    <Transaction>2023/10/14 17:24:00.173,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2023/10/14 17:24:03.691,D:\Dev\Projects\Embar\Projects\StoneNotes\StoneNotes.dproj=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>2023/10/14 17:26:42.366,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
     <Transaction>2023/10/14 17:27:00.221,D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.SplitterPanel.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
     <Transaction>2023/10/14 17:27:44.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.fmx=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx</Transaction>
     <Transaction>2023/10/14 17:27:44.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/14 19:58:49.825,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/14 19:59:33.912,D:\Dev\Projects\Embar\Projects\StoneNotes\SplitterSerializer.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
   </Transactions>
 </BorlandProject>

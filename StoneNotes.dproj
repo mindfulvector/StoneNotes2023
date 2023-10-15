@@ -131,6 +131,7 @@
         </DCCReference>
         <DCCReference Include="FMX.BufferPanel.pas"/>
         <DCCReference Include="FMX.SplitterPanel.pas"/>
+        <DCCReference Include="SplitterSerializer.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

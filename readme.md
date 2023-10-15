@@ -9,8 +9,8 @@ Each tile contains a "buffer" which holds whatever component you want to load in
 text commands.
 
 Current buffer commands are:
-
+```
 M - open a memo field
 B - open a browser
-
+```
 <img src="screenshot.png"/>

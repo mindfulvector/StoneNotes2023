@@ -8,7 +8,8 @@ uses
   FMX.SplitterPanel in 'FMX.SplitterPanel.pas',
   SplitterSerializer in 'SplitterSerializer.pas',
   PluginManager in 'PluginManager.pas',
-  Logger in 'Logger.pas';
+  Logger in 'Logger.pas',
+  StringUtils in 'StringUtils.pas';
 
 {$R *.res}
 

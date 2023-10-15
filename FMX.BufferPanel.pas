@@ -7,7 +7,9 @@ uses
   FMX.Controls, FMX.StdCtrls, FMX.Types, FMX.Layouts, FMX.Edit,
   FMX.Memo, FMX.Graphics,
   FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics,
-  FMX.TMSFNCGraphicsTypes, FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser;
+  FMX.TMSFNCGraphicsTypes, FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser,
+
+  StringUtils;
 
 type
   TBufferPanel = class(TPanel)
@@ -154,6 +156,8 @@ begin
 end;
 
 procedure TBufferPanel.GoButtonClick(Sender: TObject);
+var
+  command: TStringDynArray;
 begin
   if Assigned(FCommandControl) then
   begin
@@ -161,8 +165,11 @@ begin
     FCommandControl := nil;
   end;
 
+  command := SplitString(FCommandEdit.Text);
+  if Length(command) = 0 then Exit;
+
   // Spawn command controls from command entry
-  if UpperCase(FCommandEdit.Text) = 'M' then
+  if UpperCase(command[0]) = 'M' then
   begin
     FCommandControl := TMemo.Create(Self);
     FCommandControl.Parent := Self;
@@ -173,7 +180,7 @@ begin
     FCommandControl.SetFocus;
   end;
 
-  if UpperCase(FCommandEdit.Text) = 'B' then
+  if UpperCase(command[0]) = 'B' then
   begin
     FCommandControl := TTMSFNCWebBrowser.Create(Self);
     FCommandControl.Parent := Self;
@@ -182,7 +189,14 @@ begin
     FCommandControl.Width := Width - 20;
     FCommandControl.Height := Height - FGoButton.Height - 30;
     FCommandControl.SetFocus;
-    TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com');
+    if Length(command) = 1 then
+      TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com')
+    else begin
+      if command[1].StartsWith('http://') or command[1].StartsWith('https://') then
+        TTMSFNCWebBrowser(FCommandControl).Navigate(command[1])
+      else
+        TTMSFNCWebBrowser(FCommandControl).Navigate('https://'+command[1]);
+    end;
   end;
 
   FCommandEdit.SelectAll;

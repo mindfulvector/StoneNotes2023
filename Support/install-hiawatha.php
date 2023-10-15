@@ -1,45 +1,5 @@
 <?php
 
-print "Setup support scripts...\n";
-
-file_put_contents("service-hiawatha.bat", <<<END
-@ECHO OFF
-
-SET INSTALL_DIR=%~dp0\Hiawatha\
-SET CYGWIN=nodosfilewarning
-
-WHOAMI /groups | FINDSTR Administrators | FINDSTR /c:"Enabled group" > NUL && GOTO MAIN
-ECHO You need to have Administrator rights to do this.
-GOTO END
-
-:MAIN
-IF /i "%1" == "i" GOTO INSTALL
-IF /i "%1" == "u" GOTO UNINSTALL
-ECHO Invalid option.
-PAUSE
-GOTO END
-
-:INSTALL
-ECHO Installing Hiawatha as a Windows service...
-"%INSTALL_DIR%program\cygrunsrv.exe" -I hiawathaStoneNotes  -d "Hiawatha webserver for StoneNotes" -f "Secure and advanced webserver, optional component for StoneNotes" -p "%INSTALL_DIR%program\hiawatha.exe" -a "-d -c '%INSTALL_DIR%config'"
-net start hiawathaStoneNotes
-GOTO END
-
-:UNINSTALL
-ECHO Uninstalling Hiawatha as a Windows service...
-net stop hiawathaStoneNotes
-"%INSTALL_DIR%program\cygrunsrv.exe" -R hiawathaStoneNotes
-
-:END
-ECHO.
-END);
-
-file_put_contents("service-hiawatha.vbs", <<<END
-set shell=CreateObject("Shell.Application")
-shell.ShellExecute "service-hiawatha.bat","i",".\", "runas", 0 
-set shell=nothing
-END);
-
 print "Downloading Hiawatha web server component...\n";
 
 file_put_contents("Hiawatha.zip", 
@@ -50,6 +10,7 @@ print "Installing...\n";
 if ($output = system("tar -xf .\Hiawatha.zip -C .\\")) {
     print "Error extracting Hiawatha archive!\n";
     system("pause");
+    cleanup();
     exit(1);
 }
 
@@ -143,14 +104,60 @@ END);
 
 print "Initial component startup...\n";
 
-mkdir("C:\ProgramData\StoneNotes\Hiawatha", 0777, true);
-mkdir("C:\ProgramData\StoneNotes\Hiawatha\work", 0777, true);
+file_exists("C:\ProgramData\StoneNotes\Hiawatha\work") || mkdir("C:\ProgramData\StoneNotes\Hiawatha\work", 0777, true);
 
 system('mshta javascript:alert("StoneNotes component installation\n\nNote: You are about to be prompted to allow a Command Processor script to make changes to your system.\n\nYou must allow this for the Hiawatha component to be installed properly. Without this step, some of your StoneNotes plugins will not function properly.");close();');
+
+file_put_contents("service-hiawatha.bat", <<<END
+@ECHO OFF
+
+SET INSTALL_DIR=%~dp0\Hiawatha\
+SET CYGWIN=nodosfilewarning
+
+WHOAMI /groups | FINDSTR Administrators | FINDSTR /c:"Enabled group" > NUL && GOTO MAIN
+ECHO You need to have Administrator rights to do this.
+GOTO END
+
+:MAIN
+IF /i "%1" == "i" GOTO INSTALL
+IF /i "%1" == "u" GOTO UNINSTALL
+ECHO Invalid option.
+PAUSE
+GOTO END
+
+:INSTALL
+ECHO Installing Hiawatha as a Windows service...
+"%INSTALL_DIR%program\cygrunsrv.exe" -I hiawathaStoneNotes  -d "Hiawatha webserver for StoneNotes" -f "Secure and advanced webserver, optional component for StoneNotes" -p "%INSTALL_DIR%program\hiawatha.exe" -a "-d -c '%INSTALL_DIR%config'"
+net start hiawathaStoneNotes
+GOTO END
+
+:UNINSTALL
+ECHO Uninstalling Hiawatha as a Windows service...
+net stop hiawathaStoneNotes
+"%INSTALL_DIR%program\cygrunsrv.exe" -R hiawathaStoneNotes
+
+:END
+ECHO.
+END);
+
+file_put_contents("service-hiawatha.vbs", <<<END
+set shell=CreateObject("Shell.Application")
+shell.ShellExecute "service-hiawatha.bat","i",".\", "runas", 0 
+set shell=nothing
+END);
 
 if(false === system("cscript service-hiawatha.vbs")) {
 	print "Error installing Hiawatha service!";
     system("pause");
+    cleanup();
     exit(1);
 }
 
+cleanup();
+
+function cleanup() {
+	print "Cleaning up...\n";
+	file_exists("service-hiawatha.bat") && unlink("service-hiawatha.bat");
+	file_exists("service-hiawatha.vbs") && unlink("service-hiawatha.vbs");
+	file_exists("Hiawatha.zip") && unlink("Hiawatha.zip");
+}

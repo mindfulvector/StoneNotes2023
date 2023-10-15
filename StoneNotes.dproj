@@ -134,6 +134,7 @@
         <DCCReference Include="SplitterSerializer.pas"/>
         <DCCReference Include="PluginManager.pas"/>
         <DCCReference Include="Logger.pas"/>
+        <DCCReference Include="StringUtils.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

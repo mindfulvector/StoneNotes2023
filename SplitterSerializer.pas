@@ -3,7 +3,9 @@ unit SplitterSerializer;
 interface
 
 uses
-  System.Classes, FMX.Controls, FMX.Types, FMX.BufferPanel, FMX.SplitterPanel, System.Rtti, System.JSON;
+  System.Classes, FMX.Controls, FMX.Types, FMX.BufferPanel, FMX.SplitterPanel,
+  System.Rtti, System.JSON,
+  PluginManager;
 
 type
   TSerializedSplitter = class
@@ -18,7 +20,7 @@ type
 
     function ToString: string;
     function FromString(const AJSONStr: string): TSerializedSplitter;
-    function CreateSplitter(AOwner: TFMXObject): TSplitterPanel;
+    function CreateSplitter(AOwner: TFMXObject; APluginManager: TPluginManager): TSplitterPanel;
 
   end;
 
@@ -132,21 +134,21 @@ begin
   Result := Self;
 end;
 
-function TSerializedSplitter.CreateSplitter(AOwner: TFMXObject): TSplitterPanel;
+function TSerializedSplitter.CreateSplitter(AOwner: TFMXObject; APluginManager: TPluginManager): TSplitterPanel;
 var
   buffer: TBufferPanel;
 begin
-  Result := TSplitterPanel.Create(AOwner); // Parent can be set later when adding to another control
+  Result := TSplitterPanel.Create(AOwner, APluginManager); // Parent can be set later when adding to another control
   Result.Parent := AOwner;
   Result.SplitDirection := SplitDirection;
   Result.SplitterPosition := SplitterPosition;
 
   // Create Left Child
   if LeftControl is TSerializedSplitter then
-    Result.SetLeftControl(TSerializedSplitter(LeftControl).CreateSplitter(Result))
+    Result.SetLeftControl(TSerializedSplitter(LeftControl).CreateSplitter(Result, APluginManager))
   else if LeftControl is TSerializedBuffer then
   begin
-    buffer := TBufferPanel.Create(Result);
+    buffer := TBufferPanel.Create(Result, APluginManager);
     Result.SetLeftControl(buffer);
     buffer.SetBufferID(TSerializedBuffer(LeftControl).BufferID);
     buffer.SetCommand(TSerializedBuffer(LeftControl).CommandType);
@@ -155,10 +157,10 @@ begin
 
   // Create Right Child
   if RightControl is TSerializedSplitter then
-    Result.SetRightControl(TSerializedSplitter(RightControl).CreateSplitter(Result))
+    Result.SetRightControl(TSerializedSplitter(RightControl).CreateSplitter(Result, APluginManager))
   else if RightControl is TSerializedBuffer then
   begin
-    buffer := TBufferPanel.Create(Result);
+    buffer := TBufferPanel.Create(Result, APluginManager);
     Result.SetRightControl(buffer);
     buffer.SetBufferID(TSerializedBuffer(RightControl).BufferID);
     buffer.SetCommand(TSerializedBuffer(RightControl).CommandType);

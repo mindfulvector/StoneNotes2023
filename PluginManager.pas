@@ -3,21 +3,29 @@ unit PluginManager;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.IniFiles, System.Generics.Collections,
+  System.SysUtils, System.StrUtils, System.Classes, System.IniFiles,
+  System.Generics.Collections, System.IOUtils,
+  FMX.Dialogs,
   Logger;
 
 type
   TPlugin = class
   private
-    FFiles: TDictionary<string, string>;
-    FSettings: TDictionary<string, string>;
+    FDirectory: string;
+    FSettings: TStringList;
+    FDirName: string;
   public
     constructor Create;
     destructor Destroy; override;
 
     procedure LoadFromDirectory(const Dir: string);
-    property Files: TDictionary<string, string> read FFiles;
-    property Settings: TDictionary<string, string> read FSettings;
+    property Settings: TStringList read FSettings;
+    property DirName: string read FDirName;
+
+    function ReadFile(AFilename: string): string;
+    function GetFilePath(AFilename: string): string;
+    procedure WriteFile(AFilename, AValue: string);
+
   end;
 
   TPluginManager = class
@@ -30,6 +38,8 @@ type
 
     function LoadPlugins: integer;
     property Plugins[Index: Integer]: TPlugin read GetPlugin; default;
+
+    function FindPluginByCommand(ACommand: String): TPlugin;
   end;
 
 implementation
@@ -38,54 +48,71 @@ implementation
 
 constructor TPlugin.Create;
 begin
-  FFiles := TDictionary<string, string>.Create;
-  FSettings := TDictionary<string, string>.Create;
+  FSettings := TStringList.Create;
 end;
 
 destructor TPlugin.Destroy;
 begin
-  FFiles.Free;
   FSettings.Free;
   inherited;
 end;
 
 procedure TPlugin.LoadFromDirectory(const Dir: string);
 var
+  IniFile: String;
   Ini: TIniFile;
   Rec: TSearchRec;
   Section, Key, Value: string;
-  Strings: TStringList;
+  Sections, Keys: TStringList;
 begin
-  // Load files into dictionary
-  if FindFirst(Dir + '\*', faAnyFile, Rec) = 0 then
-  begin
-    repeat
-      FFiles.AddOrSetValue(Rec.Name, Dir + '\' + Rec.Name);
-    until FindNext(Rec) <> 0;
-    FindClose(Rec);
-  end;
+  FDirectory := Dir;
+  FDirName := ExtractFileName(Dir);
 
   // Load settings from INI
-  Ini := TIniFile.Create(Dir + '\' + ExtractFileName(Dir) + '.ini');
+  IniFile := Dir + '\' + LowerCase(ExtractFileName(Dir)) + '.ini';
+  if not FileExists(IniFile) then begin
+    ShowMessage('Plugin config file does not exist: ' + IniFile);
+    Exit;
+  end;
+
+  Ini := TIniFile.Create(IniFile);
   try
-    Strings := TStringList.Create;
+    Sections := TStringList.Create;
+    Keys := TStringList.Create;
     try
-      Ini.ReadSections(Strings);
-      for Section in Strings do
+      Ini.ReadSections(Sections);
+      for Section in Sections do
       begin
-        Ini.ReadSectionValues(Section, Strings);
-        for Key in Strings do
+        Keys.Clear;
+        Ini.ReadSection(Section, Keys);
+        for Key in Keys do
         begin
           Value := Ini.ReadString(Section, Key, '');
-          FSettings.AddOrSetValue(Section + '/' + Key, Value);
+          FSettings.Values[Section + '/' + Key] := Value;
         end;
       end;
     finally
-      Strings.Free;
+      Keys.Free;
+      Sections.Free;
     end;
   finally
     Ini.Free;
   end;
+end;
+
+function TPlugin.ReadFile(AFilename: string): string;
+begin
+  Result := TFile.ReadAllText(FDirectory + '\' + AFilename);
+end;
+
+function TPlugin.GetFilePath(AFilename: string): string;
+begin
+  Result := FDirectory + '\' + AFilename;
+end;
+
+procedure TPlugin.WriteFile(AFilename: string; AValue: string);
+begin
+  TFile.WriteAllText(FDirectory + '\' + AFilename, AValue);
 end;
 
 { TPluginManager }
@@ -124,11 +151,12 @@ begin
       begin
         Plugin := TPlugin.Create;
         try
-          Plugin.LoadFromDirectory('Plugins\' + Rec.Name);
+          Plugin.LoadFromDirectory(ReplaceStr(Pattern, '*', Rec.Name));
           FPlugins.Add(Plugin);
           Logger.Log(Format('Load plugin "%s"', [Rec.Name]));
           Inc(Count);
         except
+          Logger.Log(Format('Error loading plugin "%s"', [Rec.Name]));
           Plugin.Free;
           raise;
         end;
@@ -137,6 +165,22 @@ begin
     FindClose(Rec);
   end;
   Result := Count;
+end;
+
+function TPluginManager.FindPluginByCommand(ACommand: String): TPlugin;
+var
+  I: Integer;
+  Value: String;
+begin
+  Result := nil;
+  for I := 0 to FPlugins.Count - 1 do
+  begin
+    Value := FPlugins[I].Settings.Values['plugin/command'];
+    if Value = ACommand then
+    begin
+      Result := FPlugins[I];
+    end;
+  end;
 end;
 
 end.

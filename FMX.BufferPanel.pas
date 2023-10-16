@@ -4,12 +4,13 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.UITypes, System.Types,
+  System.IOUtils, System.StrUtils,
   FMX.Controls, FMX.StdCtrls, FMX.Types, FMX.Layouts, FMX.Edit,
   FMX.Memo, FMX.Graphics,
   FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics,
   FMX.TMSFNCGraphicsTypes, FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser,
 
-  StringUtils;
+  StringUtils, PluginManager;
 
 type
   TBufferPanel = class(TPanel)
@@ -19,13 +20,14 @@ type
     FCommandControl: TControl;
     FBufferIdLabel: TLabel;
     FBufferID: integer;
+    FPluginManager: TPluginManager;
     procedure GoButtonClick(Sender: TObject);
     procedure CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
   protected
     procedure Paint; override;
     procedure Resize; override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; APluginManager: TPluginManager);
 
     function BufferID: integer;
     procedure SetBufferID(PBufferID: integer);
@@ -42,9 +44,10 @@ implementation
 var
   LastBufferID: Integer = 0;
 
-constructor TBufferPanel.Create(AOwner: TComponent);
+constructor TBufferPanel.Create(AOwner: TComponent; APluginManager: TPluginManager);
 begin
   inherited Create(AOwner);
+  FPluginManager := APluginManager;
 
   Inc(LastBufferID);
   FBufferID := LastBufferID;
@@ -158,19 +161,22 @@ end;
 procedure TBufferPanel.GoButtonClick(Sender: TObject);
 var
   command: TStringDynArray;
+  Plugin: PluginManager.TPlugin;
+  PluginPage: String;
+  PluginPageHTML: String;
+  AssetsDir, PluginsDir: string;
+  FileURL: string;
 begin
-  if Assigned(FCommandControl) then
-  begin
-    FCommandControl.DisposeOf;
-    FCommandControl := nil;
-  end;
 
   command := SplitString(FCommandEdit.Text);
   if Length(command) = 0 then Exit;
 
+  command[0] := UpperCase(command[0]);
+
   // Spawn command controls from command entry
-  if UpperCase(command[0]) = 'M' then
+  if command[0] = 'M' then
   begin
+    if Assigned(FCommandControl) then FCommandControl.DisposeOf;
     FCommandControl := TMemo.Create(Self);
     FCommandControl.Parent := Self;
     FCommandControl.Position.X := 10;
@@ -178,17 +184,24 @@ begin
     FCommandControl.Width := Width - 20;
     FCommandControl.Height := Height - FGoButton.Height - 30;
     FCommandControl.SetFocus;
+    Resize;
   end;
 
-  if UpperCase(command[0]) = 'B' then
+  if command[0] = 'B' then
   begin
-    FCommandControl := TTMSFNCWebBrowser.Create(Self);
-    FCommandControl.Parent := Self;
-    FCommandControl.Position.X := 10;
-    FCommandControl.Position.Y := FGoButton.Height + 20;
-    FCommandControl.Width := Width - 20;
-    FCommandControl.Height := Height - FGoButton.Height - 30;
+    if Assigned(FCommandControl) and (not (FCommandControl is TTMSFNCWebBrowser)) then FCommandControl.DisposeOf;
+    if not (FCommandControl is TTMSFNCWebBrowser) then
+    begin
+      FCommandControl := TTMSFNCWebBrowser.Create(Self);
+      FCommandControl.Parent := Self;
+      FCommandControl.Position.X := 10;
+      FCommandControl.Position.Y := FGoButton.Height + 20;
+      FCommandControl.Width := Width - 20;
+      FCommandControl.Height := Height - FGoButton.Height - 30;
+    end;
     FCommandControl.SetFocus;
+    TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
+    Resize;
     if Length(command) = 1 then
       TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com')
     else begin
@@ -196,6 +209,72 @@ begin
         TTMSFNCWebBrowser(FCommandControl).Navigate(command[1])
       else
         TTMSFNCWebBrowser(FCommandControl).Navigate('https://'+command[1]);
+    end;
+  end;
+
+  if nil = FCommandControl then
+  begin
+    Plugin := FPluginManager.FindPluginByCommand(command[0]);
+    if Assigned(Plugin) then
+    begin
+      if Assigned(FCommandControl) and (not (FCommandControl is TTMSFNCWebBrowser)) then FCommandControl.DisposeOf;
+      if not (FCommandControl is TTMSFNCWebBrowser) then
+      begin
+        FCommandControl := TTMSFNCWebBrowser.Create(Self);
+        FCommandControl.Parent := Self;
+        FCommandControl.Position.X := 10;
+        FCommandControl.Position.Y := FGoButton.Height + 20;
+        FCommandControl.Width := Width - 20;
+        FCommandControl.Height := Height - FGoButton.Height - 30;
+      end;
+      FCommandControl.SetFocus;
+      TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
+      Resize;
+      if Assigned(Plugin.Settings) then
+      begin
+        PluginPage := Plugin.Settings.Values['plugin/command_'+command[0]];
+        if '' <> PluginPage then
+        begin
+          PluginPageHTML := Plugin.ReadFile(PluginPage);
+
+          AssetsDir := ExtractFileDir(ParamStr(0)) + '\Assets';
+          if not DirectoryExists(AssetsDir) then
+            AssetsDir :=  ExtractFileDir(ExtractFileDir(ParamStr(0))) + '\Assets';
+          if not DirectoryExists(AssetsDir) then
+            AssetsDir :=  ExtractFileDir(ExtractFileDir(ExtractFileDir(ParamStr(0)))) + '\Assets';
+
+          PluginsDir := ReplaceStr(AssetsDir, '\Assets', '\Plugins');
+
+          PluginPageHTML := ReplaceStr(PluginPageHTML, '{assets}', AssetsDir);
+          Plugin.WriteFile('eval_'+PluginPage, PluginPageHTML);
+          FileURL := 'file://'+ReplaceStr(PluginsDir + '\' + Plugin.DirName + '\eval_' + PluginPage, '\', '/');
+          TTMSFNCWebBrowser(FCommandControl).Navigate(FileURL);
+        end else begin
+          TTMSFNCWebBrowser(FCommandControl).LoadHTML('<div style="border: 1px solid red; margin: 10px; padding: 10px;">Error: Command has no page mapping in this plugin.</div>');
+        end;
+      end;
+    end;
+  end;
+
+  if nil = FCommandControl then
+  begin
+    Plugin := FPluginManager.FindPluginByCommand(command[0]);
+    if nil <> Plugin then
+    begin
+      if Assigned(FCommandControl) and (not (FCommandControl is TTMSFNCWebBrowser)) then FCommandControl.DisposeOf;
+      if not (FCommandControl is TTMSFNCWebBrowser) then
+      begin
+        FCommandControl := TTMSFNCWebBrowser.Create(Self);
+        FCommandControl.Parent := Self;
+        FCommandControl.Position.X := 10;
+        FCommandControl.Position.Y := FGoButton.Height + 20;
+        FCommandControl.Width := Width - 20;
+        FCommandControl.Height := Height - FGoButton.Height - 30;
+      end;
+      FCommandControl.SetFocus;
+      TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
+      Resize;
+      TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style><div style="border: 1px solid red; margin: 10px; padding: 10px;">Error: Unknown command.</div>');
     end;
   end;
 

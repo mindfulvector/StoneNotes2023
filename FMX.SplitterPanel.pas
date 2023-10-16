@@ -5,7 +5,8 @@ interface
 uses
   System.Classes, System.Types, System.UITypes, FMX.Controls, FMX.Types,
   FMX.Graphics, FMX.Objects,
-  FMX.BufferPanel;
+  FMX.BufferPanel,
+  PluginManager;
 
 type
   TSplitDirection = (sdVertical, sdHorizontal);
@@ -17,9 +18,10 @@ type
     FLeftControl, FRightControl: TControl;
     FSplitterPosition: Integer;
     IsCaptured: Boolean;
+    FPluginManager: TPluginManager;
     function CalcSplitterPositionPixels: Single;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; APluginManager: TPluginManager);
     procedure Paint; override;
     procedure Resize; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -38,12 +40,12 @@ type
 
 implementation
 
-constructor TSplitterPanel.Create(AOwner: TComponent);
+constructor TSplitterPanel.Create(AOwner: TComponent; APluginManager: TPluginManager);
 begin
   inherited Create(AOwner);
+  FPluginManager := APluginManager;
   FSplitterPosition := 50;
   FSplitDirection := sdVertical; // Default direction
-  
 end;
 
 function TSplitterPanel.CalcSplitterPositionPixels: Single;
@@ -77,7 +79,7 @@ begin
 
     if not Assigned(FLeftControl) then
     begin
-      FLeftControl := TBufferPanel.Create(Self);
+      FLeftControl := TBufferPanel.Create(Self, FPluginManager);
     end;
 
     FLeftControl.Parent := Self;
@@ -93,7 +95,7 @@ begin
 
     if not Assigned(FRightControl) then
     begin
-      FRightControl := TBufferPanel.Create(Self);
+      FRightControl := TBufferPanel.Create(Self, FPluginManager);
     end;
 
     FRightControl.Parent := Self;
@@ -244,7 +246,7 @@ function TSplitterPanel.SplitSide(ASide: TSide): TSplitterPanel;
 var
   NewSplitterPanel: TSplitterPanel;
 begin
-  NewSplitterPanel := TSplitterPanel.Create(Self);
+  NewSplitterPanel := TSplitterPanel.Create(Self, FPluginManager);
   if Self.SplitDirection = TSplitDirection.sdVertical then
   begin
     NewSplitterPanel.SetSplitDirection(TSplitDirection.sdHorizontal);

@@ -54,7 +54,7 @@ begin
     FSplitterPanel.DisposeOf;
     FSplitterPanel := nil;
     serializer := TSerializedSplitter.Create.FromString(data);
-    FSplitterPanel := serializer.CreateSplitter(Self);
+    FSplitterPanel := serializer.CreateSplitter(Self, FPluginManager);
     FSplitterPanel.Parent := Self;
     FLastSplitterRight := FSplitterPanel;
     FLastSplitterLeft := FSplitterPanel;
@@ -94,14 +94,6 @@ procedure TfrmStoneNotes.FormCreate(Sender: TObject);
 var
   PluginCount: integer;
 begin
-  FSplitterPanel := TSplitterPanel.Create(Self);
-  FSplitterPanel.Parent := Self;
-  FSplitterPanel.SetLeftControl(nil);
-  FSplitterPanel.SetRightControl(nil);
-  FLastSplitterRight := FSplitterPanel;
-  FLastSplitterLeft := FSplitterPanel;
-  Resize;
-
   FPluginManager := TPluginManager.Create;
   PluginCount := FPluginManager.LoadPlugins;
   if PluginCount = 0 then
@@ -111,6 +103,13 @@ begin
     Logger.Log(Format('Loaded %d plugins.', [PluginCount]));
   end;
 
+  FSplitterPanel := TSplitterPanel.Create(Self, FPluginManager);
+  FSplitterPanel.Parent := Self;
+  FSplitterPanel.SetLeftControl(nil);
+  FSplitterPanel.SetRightControl(nil);
+  FLastSplitterRight := FSplitterPanel;
+  FLastSplitterLeft := FSplitterPanel;
+  Resize;
 end;
 
 procedure TfrmStoneNotes.FormDeactivate(Sender: TObject);

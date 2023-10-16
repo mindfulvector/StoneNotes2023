@@ -23,14 +23,18 @@ type
     FPluginManager: TPluginManager;
     procedure GoButtonClick(Sender: TObject);
     procedure CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
+    procedure CreateBrowser;
+    procedure BufferCommandMemo(command: TArray<System.string>);
+    procedure BufferCommandBrowser(command: TArray<System.string>);
+    procedure ScanForPluginCmd(command: TArray<System.string>);
+    procedure DisplayError(AMessage: String);
   protected
-    procedure Paint; override;
     procedure Resize; override;
   public
     constructor Create(AOwner: TComponent; APluginManager: TPluginManager);
 
     function BufferID: integer;
-    procedure SetBufferID(PBufferID: integer);
+    procedure SetBufferID(ABufferID: integer);
 
     function Command: string;
     procedure SetCommand(SCommand: string);
@@ -77,210 +81,251 @@ begin
   FGoButton.OnClick := GoButtonClick;
 end;
 
+// Buffer ID is a session-unique integer that identifies this buffer.
+// Note that previous BufferIDs may be "reused" when a layout file is loaded,
+// therefore when a layout file is loaded it is treated as a brand new session.
 function TBufferPanel.BufferID: integer;
 begin
   Result := FBufferID;
 end;
 
-procedure TBufferPanel.SetBufferID(PBufferID: integer);
+// Used to restore a IDs to buffers when loaded from a layout file.
+procedure TBufferPanel.SetBufferID(ABufferID: integer);
 begin
-  FBufferID := PBufferID;
+  // We reset the LastBufferID static down to this new ID if it either
+  // matches LastBufferID or is higher than it, so that the state matches
+  // the buffers loaded from this layout.
+  if ABufferID >= LastBufferID then
+    LastBufferID := ABufferID;
+
+  FBufferID := ABufferID;
   FBufferIdLabel.Text := 'Buffer ID: ' + IntToStr(FBufferID);
   FGoButton.Text := 'Go ' + IntToStr(FBufferID);
 end;
 
-
+// Retrieves the last entered command.
 function TBufferPanel.Command: string;
 begin
   Command := FCommandEdit.Text;
 end;
 
+// Parses the given string as if it was entered by the user as a buffer command.
 procedure TBufferPanel.SetCommand(SCommand: string);
 begin
   FCommandEdit.Text := SCommand;
   GoButtonClick(FGoButton);
 end;
 
+// Properties is a string defined by the buffer command for storing
+// key values needed to reload state.
 function TBufferPanel.Properties: string;
 begin
   if FCommandControl is TMemo then
-  begin
     Properties := TMemo(FCommandControl).Text;
-  end;
 
   if FCommandControl is TTMSFNCWebBrowser then
-  begin
     Properties := TTMSFNCWebBrowser(FCommandControl).URL;
-  end;
 end;
 
+// Restore properties to the buffer command component.
 procedure TBufferPanel.SetProperties(SProperties: string);
 begin
   if FCommandControl is TMemo then
-  begin
     TMemo(FCommandControl).Text := SProperties;
-  end;
 
   if FCommandControl is TTMSFNCWebBrowser then
-  begin
     TTMSFNCWebBrowser(FCommandControl).Navigate(SProperties);
-  end;
 end;
 
-procedure TBufferPanel.Paint;
+// Note: Unlike other methods named in the pattern BufferCommand*, which
+// expect to always recieve a valid command matching their format, this one
+// scans for plugin commands and MAY load a plugin into the buffer if one
+// is found that matches the command array.
+procedure TBufferPanel.ScanForPluginCmd(command: TArray<System.string>);
 var
-  R: TRectF;
-begin
-  inherited;
-
-  R := LocalRect;
-  Canvas.Fill.Kind := TBrushKind.Solid;
-  Canvas.Fill.Color := TAlphaColor($FF1b2035);
-  Canvas.FillRect(R, 0, 0, AllCorners, 1.0);
-end;
-
-procedure TBufferPanel.Resize;
-begin
-  inherited;
-  if Assigned(FCommandEdit) then
-  begin
-    FCommandEdit.SetBounds(10, FBufferIdLabel.Position.Y + FBufferIdLabel.Height + 5, Width - 70, FCommandEdit.Height);
-  end;
-
-  if Assigned(FGoButton) then
-  begin
-    FGoButton.Position.X := Width - FGoButton.Width - 10;
-  end;
-
-  if Assigned(FCommandControl) then
-  begin
-    FCommandControl.SetBounds(0, FGoButton.Position.Y + FGoButton.Height + 10, Width, Height - (FGoButton.Position.Y + FGoButton.Height + 10));
-  end;
-end;
-
-procedure TBufferPanel.GoButtonClick(Sender: TObject);
-var
-  command: TStringDynArray;
-  Plugin: PluginManager.TPlugin;
-  PluginPage: String;
-  PluginPageHTML: String;
-  AssetsDir, PluginsDir: string;
+  Plugin: TPlugin;
+  PluginPage: string;
+  PluginPageHTML: string;
+  AssetsDir: string;
+  PluginsDir: string;
   FileURL: string;
 begin
-
-  command := SplitString(FCommandEdit.Text);
-  if Length(command) = 0 then Exit;
-
-  command[0] := UpperCase(command[0]);
-
-  // Spawn command controls from command entry
-  if command[0] = 'M' then
+  Plugin := FPluginManager.FindPluginByCommand(command[0]);
+  if Assigned(Plugin) then
   begin
-    if Assigned(FCommandControl) then FCommandControl.DisposeOf;
-    FCommandControl := TMemo.Create(Self);
+    CreateBrowser;
+    if Assigned(Plugin.Settings) then
+    begin
+      PluginPage := Plugin.Settings.Values['plugin/command_' + command[0]];
+      if '' <> PluginPage then
+      begin
+        PluginPageHTML := Plugin.ReadFile(PluginPage);
+
+        // Inject StorageService JS function
+        PluginPageHTML := ReplaceStr(PluginPageHTML, '</head>',
+          '<script>'
+          +TTMSFNCWebBrowser(FCommandControl).GetBridgeCommunicationLayer('storageservice')
+          +'</script></head>');
+
+        // Convert line endings to be consistent so we can use the JS debuffer
+        PluginPageHTML := StandardizeLineEndings(PluginPageHTML);
+
+        // Find Assets directory, in installed environment or in debug environment
+        AssetsDir := ExtractFileDir(ParamStr(0)) + '\Assets';
+        if not DirectoryExists(AssetsDir) then
+          AssetsDir := ExtractFileDir(ExtractFileDir(ParamStr(0))) + '\Assets';
+        if not DirectoryExists(AssetsDir) then
+          AssetsDir := ExtractFileDir(ExtractFileDir(ExtractFileDir(ParamStr(0)))) + '\Assets';
+
+        // Find plugins directory
+        PluginsDir := ReplaceStr(AssetsDir, '\Assets', '\Plugins');
+
+        // Swap in template tokens
+        PluginPageHTML := ReplaceStr(PluginPageHTML, '{assets}', AssetsDir);
+        PluginPageHTML := ReplaceStr(PluginPageHTML, '{plugins}', PluginsDir);
+        PluginPageHTML := ReplaceStr(PluginPageHTML, '{plugin_dir}',
+                                     PluginsDir+'\'+Plugin.DirName);
+
+        // Store next to the original plugin file with a prefix to the filename
+        Plugin.WriteFile('eval_' + PluginPage, PluginPageHTML);
+
+        // Setup URL to the prepared HTML file using the file protocol.
+        // This is required so that the page can load assets from the Assets
+        // and Plugins paths, which is not allowed when HTML is loaded via
+        // LoadHTML.
+        FileURL := 'file://'+ReplaceStr(PluginsDir + '\'
+                            +Plugin.DirName
+                            +'\eval_'
+                            +PluginPage, '\', '/');
+
+        // Load it!
+        TTMSFNCWebBrowser(FCommandControl).Navigate(FileURL);
+      end else begin
+        DisplayError('Error: Command is registered to plugin '
+                      +'"'+Plugin.DirName+'", '
+                      +'but has no page mapping.');
+      end;
+    end;
+  end;
+end;
+
+// B - Basic web browser
+procedure TBufferPanel.BufferCommandBrowser(command: TArray<System.string>);
+begin
+  CreateBrowser;
+  if Length(command) = 1 then
+    TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com')
+  else
+  begin
+    if command[1].StartsWith('http://') or command[1].StartsWith('https://') then
+      TTMSFNCWebBrowser(FCommandControl).Navigate(command[1])
+    else
+      TTMSFNCWebBrowser(FCommandControl).Navigate('https://' + command[1]);
+  end;
+end;
+
+// M - Basic memo field
+procedure TBufferPanel.BufferCommandMemo(command: TArray<System.string>);
+begin
+  if Assigned(FCommandControl) then
+    FCommandControl.DisposeOf;
+  FCommandControl := TMemo.Create(Self);
+  FCommandControl.Parent := Self;
+  FCommandControl.Position.X := 10;
+  FCommandControl.Position.Y := FGoButton.Height + 20;
+  FCommandControl.Width := Width - 20;
+  FCommandControl.Height := Height - FGoButton.Height - 30;
+  FCommandControl.SetFocus;
+  Resize;
+end;
+
+// Error display helper
+procedure TBufferPanel.DisplayError(AMessage: String);
+begin
+  CreateBrowser;
+  TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
+  Resize;
+  TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>'
+  +'<div style="border: 1px solid red; margin: 10px; padding: 10px;">'
+  +AMessage+'</div>');
+end;
+
+// Create* methods should create a buffer component used by multiple buffer
+// commands. CreateBrowser is used by the base B command as well as HTML/CSS/JS
+// plugins and the error display helper.
+procedure TBufferPanel.CreateBrowser;
+begin
+  if Assigned(FCommandControl) and (not (FCommandControl is TTMSFNCWebBrowser)) then
+    FCommandControl.DisposeOf;
+  if not (FCommandControl is TTMSFNCWebBrowser) then
+  begin
+    FCommandControl := TTMSFNCWebBrowser.Create(Self);
+    TTMSFNCWebBrowser(FCommandControl).AddBridge('StorageService', FPluginManager.GetStorageService);
     FCommandControl.Parent := Self;
     FCommandControl.Position.X := 10;
     FCommandControl.Position.Y := FGoButton.Height + 20;
     FCommandControl.Width := Width - 20;
     FCommandControl.Height := Height - FGoButton.Height - 30;
-    FCommandControl.SetFocus;
-    Resize;
   end;
-
-  if command[0] = 'B' then
-  begin
-    if Assigned(FCommandControl) and (not (FCommandControl is TTMSFNCWebBrowser)) then FCommandControl.DisposeOf;
-    if not (FCommandControl is TTMSFNCWebBrowser) then
-    begin
-      FCommandControl := TTMSFNCWebBrowser.Create(Self);
-      FCommandControl.Parent := Self;
-      FCommandControl.Position.X := 10;
-      FCommandControl.Position.Y := FGoButton.Height + 20;
-      FCommandControl.Width := Width - 20;
-      FCommandControl.Height := Height - FGoButton.Height - 30;
-    end;
-    FCommandControl.SetFocus;
-    TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
-    Resize;
-    if Length(command) = 1 then
-      TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com')
-    else begin
-      if command[1].StartsWith('http://') or command[1].StartsWith('https://') then
-        TTMSFNCWebBrowser(FCommandControl).Navigate(command[1])
-      else
-        TTMSFNCWebBrowser(FCommandControl).Navigate('https://'+command[1]);
-    end;
-  end;
-
-  if nil = FCommandControl then
-  begin
-    Plugin := FPluginManager.FindPluginByCommand(command[0]);
-    if Assigned(Plugin) then
-    begin
-      if Assigned(FCommandControl) and (not (FCommandControl is TTMSFNCWebBrowser)) then FCommandControl.DisposeOf;
-      if not (FCommandControl is TTMSFNCWebBrowser) then
-      begin
-        FCommandControl := TTMSFNCWebBrowser.Create(Self);
-        FCommandControl.Parent := Self;
-        FCommandControl.Position.X := 10;
-        FCommandControl.Position.Y := FGoButton.Height + 20;
-        FCommandControl.Width := Width - 20;
-        FCommandControl.Height := Height - FGoButton.Height - 30;
-      end;
-      FCommandControl.SetFocus;
-      TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
-      Resize;
-      if Assigned(Plugin.Settings) then
-      begin
-        PluginPage := Plugin.Settings.Values['plugin/command_'+command[0]];
-        if '' <> PluginPage then
-        begin
-          PluginPageHTML := Plugin.ReadFile(PluginPage);
-
-          AssetsDir := ExtractFileDir(ParamStr(0)) + '\Assets';
-          if not DirectoryExists(AssetsDir) then
-            AssetsDir :=  ExtractFileDir(ExtractFileDir(ParamStr(0))) + '\Assets';
-          if not DirectoryExists(AssetsDir) then
-            AssetsDir :=  ExtractFileDir(ExtractFileDir(ExtractFileDir(ParamStr(0)))) + '\Assets';
-
-          PluginsDir := ReplaceStr(AssetsDir, '\Assets', '\Plugins');
-
-          PluginPageHTML := ReplaceStr(PluginPageHTML, '{assets}', AssetsDir);
-          Plugin.WriteFile('eval_'+PluginPage, PluginPageHTML);
-          FileURL := 'file://'+ReplaceStr(PluginsDir + '\' + Plugin.DirName + '\eval_' + PluginPage, '\', '/');
-          TTMSFNCWebBrowser(FCommandControl).Navigate(FileURL);
-        end else begin
-          TTMSFNCWebBrowser(FCommandControl).LoadHTML('<div style="border: 1px solid red; margin: 10px; padding: 10px;">Error: Command has no page mapping in this plugin.</div>');
-        end;
-      end;
-    end;
-  end;
-
-  if nil = FCommandControl then
-  begin
-    Plugin := FPluginManager.FindPluginByCommand(command[0]);
-    if nil <> Plugin then
-    begin
-      if Assigned(FCommandControl) and (not (FCommandControl is TTMSFNCWebBrowser)) then FCommandControl.DisposeOf;
-      if not (FCommandControl is TTMSFNCWebBrowser) then
-      begin
-        FCommandControl := TTMSFNCWebBrowser.Create(Self);
-        FCommandControl.Parent := Self;
-        FCommandControl.Position.X := 10;
-        FCommandControl.Position.Y := FGoButton.Height + 20;
-        FCommandControl.Width := Width - 20;
-        FCommandControl.Height := Height - FGoButton.Height - 30;
-      end;
-      FCommandControl.SetFocus;
-      TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
-      Resize;
-      TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style><div style="border: 1px solid red; margin: 10px; padding: 10px;">Error: Unknown command.</div>');
-    end;
-  end;
-
-  FCommandEdit.SelectAll;
-
+  FCommandControl.SetFocus;
+  TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
   Resize;
+end;
+
+// Keep buffer components visible and using the full buffer space
+procedure TBufferPanel.Resize;
+begin
+  inherited;
+
+  // Basic chrome for buffer itself
+  FCommandEdit.SetBounds(
+          {x}10,
+          {y}FBufferIdLabel.Position.Y + FBufferIdLabel.Height + 5,
+          {w}Width - 70,
+          {h}FCommandEdit.Height);
+  FGoButton.Position.X := Width - FGoButton.Width - 10;
+
+  // Resize the component
+  if Assigned(FCommandControl) then
+    FCommandControl.SetBounds(
+            {x}0,
+            {y}FGoButton.Position.Y + FGoButton.Height + 10,
+            {w}Width,
+            {h}Height - (FGoButton.Position.Y + FGoButton.Height + 10));
+end;
+
+procedure TBufferPanel.GoButtonClick(Sender: TObject);
+var
+  command: TStringDynArray;
+begin
+  command := SplitString(FCommandEdit.Text);
+  if Length(command) = 0 then
+  begin
+    if Assigned(FCommandControl) then
+      FCommandControl.DisposeOf;
+    FCommandControl := nil;
+    Exit;
+  end;
+  // Commands are setup internally in uppercase
+  command[0] := UpperCase(command[0]);
+
+  // Place back into command field to uppsercase the command
+  FCommandEdit.Text := JoinString(command);
+
+  // Spawn command controls from command entry...
+
+  // Check built-in commands first
+  if command[0] = 'M' then BufferCommandMemo(command);
+  if command[0] = 'B' then BufferCommandBrowser(command);
+
+  // Scan for plugin commands
+  if nil = FCommandControl then ScanForPluginCmd(command);
+
+  // Invalid command, bummer!
+  if nil = FCommandControl then DisplayError('Error: Unknown command.');
+
+  // Prepare to enter new command
+  FCommandEdit.SelectAll;
 end;
 
 procedure TBufferPanel.CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
@@ -288,7 +333,7 @@ begin
   if Key = vkReturn then
   begin
     GoButtonClick(Self);
-    Key := 0;  // Prevent default beep or any other default action
+    Key := 0;  // Prevent default beep
   end;
 end;
 

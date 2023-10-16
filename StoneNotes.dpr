@@ -9,7 +9,8 @@ uses
   SplitterSerializer in 'SplitterSerializer.pas',
   PluginManager in 'PluginManager.pas',
   Logger in 'Logger.pas',
-  StringUtils in 'StringUtils.pas';
+  StringUtils in 'StringUtils.pas',
+  PluginStorageService in 'PluginStorageService.pas';
 
 {$R *.res}
 

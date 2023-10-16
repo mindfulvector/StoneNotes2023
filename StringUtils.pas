@@ -6,6 +6,9 @@ uses
   System.Types;
 
 function SplitString(const AInput: string): TStringDynArray;
+function JoinString(const Arr: TStringDynArray): string;
+function EscapeString(const s: string): string;
+function StandardizeLineEndings(const S: string): string;
 
 implementation
 
@@ -86,6 +89,52 @@ begin
     SetLength(Result, Length(Result) + 1);
     Result[High(Result)] := Copy(AInput, StartPos, Length(AInput) - StartPos + 1);
   end;
+end;
+
+function JoinString(const Arr: TStringDynArray): string;
+var
+  s, Encoded: string;
+begin
+  Result := '';
+
+  for s in Arr do
+  begin
+    Encoded := EscapeString(s);
+
+    if (Pos(' ', Encoded) > 0) or (Pos('"', s) > 0) or (Pos('''', s) > 0) or (Pos('\', s) > 0) then
+      Result := Result + '"' + Encoded + '" '  // Wrap with double quotes after escaping
+    else
+      Result := Result + Encoded + ' ';
+  end;
+
+  // Remove the trailing space, if present
+  if (Result <> '') and (Result[Length(Result)] = ' ') then
+    SetLength(Result, Length(Result) - 1);
+end;
+
+function EscapeString(const s: string): string;
+var
+  i: Integer;
+begin
+  Result := '';
+  for i := 1 to Length(s) do
+  begin
+    if s[i] in ['\', '"'] then
+      Result := Result + '\';  // Add a backslash before the character
+    Result := Result + s[i];
+  end;
+end;
+
+function StandardizeLineEndings(const S: string): string;
+begin
+  Result := S;
+
+  // Replace CR+LF with LF to make sure we don't double-convert in the next step.
+  Result := StringReplace(Result, #13#10, #10, [rfReplaceAll]);
+  Result := StringReplace(Result, #13, #10, [rfReplaceAll]);
+
+  // Replace LF with CR+LF.
+  Result := StringReplace(Result, #10, #13#10, [rfReplaceAll]);
 end;
 
 end.

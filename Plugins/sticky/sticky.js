@@ -5,6 +5,8 @@ $(document).ready(function(){
         { x: '30px', y: '140px', width: '200px', height: '160px', text: "Notes are currently stored in local storage, not the StoneNotes layout file or database.<br><b>This means that they will be lost when StoneNotes is shutdown.</b><br>This is just a test plugin for now!"},
     ];
 
+    //test
+
     // Render loaded notes to page
     for (let note of notes) {
         const $noteDiv = $('<div></div>').addClass('sticky-note')
@@ -73,6 +75,10 @@ $(document).ready(function(){
         $noteDiv.draggable({handle: '.draghandle'});
 
         bindNoteEvents($noteDiv);
+    });
+
+    $('#saveNotes').on('click', () => {
+        saveNotes();
     });
 
     window.onbeforeunload = function() {
@@ -145,7 +151,11 @@ function saveNotes() {
             text: $(this).find('.body').html()
         };
     }).get();
-    console.log(savedNotes);
+    var storage = window.chrome.webview.hostObjects.sync.storageservice;
+    console.log('storage object', storage);
+    sendStorageServiceObjectMessage(JSON.stringify({'func': 'WriteLayoutValue', 'key': 'CorkNotes', 'value': savedNotes}));
+    storage.ObjectMessage = JSON.stringify({'func': 'WriteLayoutValue', 'key': 'CorkNotes', 'value': savedNotes});
+    console.log('saved notes', savedNotes);
     localStorage.setItem('CorkNotes', JSON.stringify(savedNotes));
 }
 

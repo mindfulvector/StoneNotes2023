@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.StrUtils, System.Classes, System.IniFiles,
   System.Generics.Collections, System.IOUtils,
   FMX.Dialogs,
-  Logger;
+  Logger, PluginStorageService;
 
 type
   TPlugin = class
@@ -31,6 +31,7 @@ type
   TPluginManager = class
   private
     FPlugins: TObjectList<TPlugin>;
+    FPluginStorageService: TPluginStorageService;
     function GetPlugin(Index: Integer): TPlugin;
   public
     constructor Create;
@@ -40,6 +41,8 @@ type
     property Plugins[Index: Integer]: TPlugin read GetPlugin; default;
 
     function FindPluginByCommand(ACommand: String): TPlugin;
+
+    function GetStorageService: TPluginStorageService;
   end;
 
 implementation
@@ -120,17 +123,24 @@ end;
 constructor TPluginManager.Create;
 begin
   FPlugins := TObjectList<TPlugin>.Create;
+  FPluginStorageService := TPluginStorageService.Create;
 end;
 
 destructor TPluginManager.Destroy;
 begin
   FPlugins.Free;
+  FPluginStorageService.Free;
   inherited;
 end;
 
 function TPluginManager.GetPlugin(Index: Integer): TPlugin;
 begin
   Result := FPlugins[Index];
+end;
+
+function TPluginManager.GetStorageService: TPluginStorageService;
+begin
+  Result := FPluginStorageService;
 end;
 
 function TPluginManager.LoadPlugins: integer;

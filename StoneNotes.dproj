@@ -135,6 +135,7 @@
         <DCCReference Include="PluginManager.pas"/>
         <DCCReference Include="Logger.pas"/>
         <DCCReference Include="StringUtils.pas"/>
+        <DCCReference Include="PluginStorageService.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

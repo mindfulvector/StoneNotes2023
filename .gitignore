@@ -8,3 +8,4 @@ tests\Win64
 Support/*.zip
 Support/Hiawatha/*
 __recovery
+Plugins/ThinVNC/*

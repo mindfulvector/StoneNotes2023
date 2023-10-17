@@ -12,7 +12,7 @@ Current buffer commands are:
 ```
 M - open a memo field
 B - open a browser
-STIC - Sticky Notes demo plugin (data not saved yet!)
+STIC - Sticky Notes demo plugin (data now saved to the layout file, if you save a layout)
 ```
 
 <img src="screenshot2.png"/>

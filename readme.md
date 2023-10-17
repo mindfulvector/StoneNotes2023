@@ -13,8 +13,11 @@ Current buffer commands are:
 M - open a memo field
 B - open a browser
 STIC - Sticky Notes demo plugin (data now saved to the layout file, if you save a layout)
+GEN - AI-generated wallpaper prompt generator
 ```
 
 <img src="screenshot2.png"/>
 
 <img src="screenshot.png"/>
+
+<img src="screenshot3.png"/>

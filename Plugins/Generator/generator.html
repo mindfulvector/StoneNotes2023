@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Variations</title>
+    <style>
+        .box {
+            border-radius: 25px;
+            border: 2px solid black;
+            padding: 20px;
+            margin: 10px 0;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body onload="generateSentences()">
+
+<div id="container"></div>
+
+<script>
+    const nouns = [
+        "alien landscape", "three moons", "strange, bioluminescent flora", "towering crystalline structures",
+        "underwater vista", "corals of neon colors", "schools of alien fish", "colossal ancient ruin",
+        "futuristic cityscape", "hovering vehicles", "networks of neon-lit pathways", "massive spaceport",
+        "digital realm", "electric pulses", "majestic tree made of pure energy", "digital fauna"
+    ];
+
+    const descriptions = [
+        "at sunset. The sky is painted in hues of pink, purple, and gold.",
+        "casting a soft glow over the undulating terrain below.",
+        "illuminating the surroundings.",
+        "reflect the setting sun's light.",
+        "where cascading light from the surface creates a dance of shadows and reflections.",
+        "creating a natural architecture.",
+        "swim harmoniously, leaving trails of light in their wake.",
+        "stands as a testament to time.",
+        "viewed from a high vantage point.",
+        "move seamlessly through the air, while intricate",
+        "crisscross between towering skyscrapers.",
+        "buzzes with activity as ships come and go.",
+        "reminiscent of a circuit board.",
+        "illuminating nodes and intersections.",
+        "its branches spreading out like circuits.",
+        "move and interact, creating a harmonious blend of nature and technology."
+    ];
+
+    const colors = ["blue", "green", "yellow", "orange", "red", "purple", "cyan", "magenta", "brown", "lime"];
+
+
+    function replaceColorWords(text) {
+        for (let color of colors) {
+            if (text.includes(color)) {
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                text = text.replace(new RegExp(`\\b${color}\\b`, 'gi'), randomColor);
+            }
+        }
+        return text;
+    }
+
+    function generateSentences() {
+        const container = document.getElementById('container');
+
+        for (let i = 0; i < 10; i++) {
+            const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+            const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];
+
+            let sentence = `A ${randomNoun} ${randomDescription}`;
+            sentence = replaceColorWords(sentence);
+
+            const div = document.createElement('div');
+            div.className = 'box';
+            div.innerHTML = 'Prompt #'+i+': ' + sentence; // use innerHTML to render the spans with styles
+
+            container.appendChild(div);
+        }
+    }
+</script>
+
+</body>
+</html>

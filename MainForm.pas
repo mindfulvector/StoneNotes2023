@@ -3,11 +3,21 @@ unit MainForm;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, FMX.Types, FMX.Controls, FMX.Forms,
-  FMX.Graphics, FMX.Dialogs, FMX.SplitterPanel, FMX.Controls.Presentation,
-  FMX.Edit, FMX.StdCtrls, FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics,
-  FMX.TMSFNCGraphicsTypes, FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser, SplitterSerializer,
-  System.IOUtils, PluginManager, Logger;
+  {system}
+  System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.IOUtils,
+
+  {framework}
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
+  FMX.Controls.Presentation, FMX.Edit, FMX.StdCtrls,
+  FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics, FMX.TMSFNCGraphicsTypes,
+  FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser, FMX.Styles,
+
+  {custom FMX compnents}
+  FMX.SplitterPanel,
+
+  {other custom classes}
+  SplitterSerializer, PluginManager, Logger, StyleMaker;
 
 type
   TfrmStoneNotes = class(TForm)
@@ -17,6 +27,8 @@ type
     saveDlg: TSaveDialog;
     openDlg: TOpenDialog;
     btnOpen: TButton;
+    btnSaveAs: TButton;
+    btnStyle: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure btnSplitRightClick(Sender: TObject);
@@ -24,12 +36,15 @@ type
     procedure btnSaveClick(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
+    procedure btnSaveAsClick(Sender: TObject);
+    procedure btnStyleClick(Sender: TObject);
   private
+    FFilename: string;
     FSplitterPanel: TSplitterPanel;
-    //FSerializer: TSerializedSplitter;
     FLastSplitterRight: TSplitterPanel;
     FLastSplitterLeft: TSplitterPanel;
     FPluginManager: TPluginManager;
+    procedure UpdateWindowCaption;
   public
     { Public declarations }
   end;
@@ -44,27 +59,59 @@ implementation
 procedure TfrmStoneNotes.btnOpenClick(Sender: TObject);
 var
   serializer: TSerializedSplitter;
+  NewSplitterPanel: TSplitterPanel;
   data: string;
 begin
   if openDlg.Execute then
   begin
     data := TFile.ReadAllText(openDlg.FileName);
-    Self.Caption := 'StoneNotes Matrix - ' + ExtractFileName(openDlg.FileName);
-    FLastSplitterRight := nil;
-    FLastSplitterLeft := nil;
-    FSplitterPanel.DisposeOf;
-    FSplitterPanel := nil;
+    FFilename := openDlg.FileName;
+    UpdateWindowCaption;
     //if Assigned(FSerializer) then
     //  FSerializer.Free;
     //FSerializer := TSerializedSplitter.Create.FromString(data);
     //FSplitterPanel := FSerializer.CreateSplitter(Self, FPluginManager);
     serializer := TSerializedSplitter.Create.FromString(data);
-    FSplitterPanel := serializer.CreateSplitter(Self, FPluginManager);
-    FSplitterPanel.Parent := Self;
-    FLastSplitterRight := FSplitterPanel;
-    FLastSplitterLeft := FSplitterPanel;
-    Resize;
+    if nil = serializer then
+    begin
+      FFilename := '';
+      ShowMessage('Invalid layout file, file is not valid JSON or is not a layout file: ' + openDlg.FileName);
+      UpdateWindowCaption;
+    end else begin
+      NewSplitterPanel := serializer.CreateSplitter(Self, FPluginManager);
+      if nil = NewSplitterPanel then
+        ShowMessage('Invalid layout file, could not create a splitter from the JSON data: ' + openDlg.FileName)
+      else
+      begin
+        FLastSplitterRight := nil;
+        FLastSplitterLeft := nil;
+        FSplitterPanel.DisposeOf;
+        FSplitterPanel := NewSplitterPanel;
+        FSplitterPanel.Parent := Self;
+        FLastSplitterRight := FSplitterPanel;
+        FLastSplitterLeft := FSplitterPanel;
+        Resize;
+      end;
+    end;
   end;
+end;
+
+procedure TfrmStoneNotes.btnSaveAsClick(Sender: TObject);
+
+begin
+  if saveDlg.Execute and ('' <> saveDlg.FileName) then
+  begin
+    FFilename := saveDlg.FileName;
+    btnSaveClick(btnSave);
+  end;
+end;
+
+procedure TfrmStoneNotes.UpdateWindowCaption;
+begin
+  if '' <> FFilename then
+    Self.Caption := 'StoneNotes Matrix - ' + ExtractFileName(FFilename)
+  else
+    Self.Caption := 'StoneNotes Matrix';
 end;
 
 procedure TfrmStoneNotes.btnSaveClick(Sender: TObject);
@@ -72,15 +119,14 @@ var
   serializer: TSerializedSplitter;
   data: string;
 begin
-  serializer := TSerializedSplitter.Create(FSplitterPanel);
-  data := serializer.ToString;
-
-  if saveDlg.Execute then
-  begin
-    TFile.WriteAllText(saveDlg.FileName, data);
-    Self.Caption := 'StoneNotes Matrix - ' + ExtractFileName(saveDlg.FileName);
+  if '' <> FFilename then begin
+    serializer := TSerializedSplitter.Create(FSplitterPanel);
+    data := serializer.ToString;
+    TFile.WriteAllText(FFilename, data);
+    UpdateWindowCaption;
+  end else begin
+    btnSaveAsClick(btnSaveAs);
   end;
-
 end;
 
 procedure TfrmStoneNotes.btnSplitLeftClick(Sender: TObject);
@@ -93,6 +139,11 @@ procedure TfrmStoneNotes.btnSplitRightClick(Sender: TObject);
 begin
   FLastSplitterRight := FLastSplitterRight.SplitSide(TSide.RightBottom);
   FLastSplitterRight.SetRightControl(nil);
+end;
+
+procedure TfrmStoneNotes.btnStyleClick(Sender: TObject);
+begin
+  ModifyAndApplyStyleToForm(Self);
 end;
 
 procedure TfrmStoneNotes.FormCreate(Sender: TObject);
@@ -124,7 +175,6 @@ end;
 
 procedure TfrmStoneNotes.FormResize(Sender: TObject);
 begin
-  btnSplitRight.Position.X := Width - btnSplitRight.Width - 20;
   FSplitterPanel.SetBounds(5, btnSplitRight.Height + 10, Self.Width - 25, Self.Height - 90);
 end;
 

@@ -94,16 +94,25 @@ end;
 
 function TSerializedSplitter.FromString(const AJSONStr: string): TSerializedSplitter;
 var
-  JSONObj: TJSONObject;
+  RootJson: TJSONObject;
+  TmpJson: TJSONValue;
   ChildJSON: TJSONValue;
 begin
-  JSONObj := TJSONObject.ParseJSONValue(AJSONStr) as TJSONObject;
+  Result := nil;
+  RootJson := TJSONObject.ParseJSONValue(AJSONStr) as TJSONObject;
+  if nil = RootJson then Exit;
   try
-    SplitDirection := TSplitDirection((JSONObj.GetValue('SplitDirection') as TJSONNumber).AsInt);
-    SplitterPosition := (JSONObj.GetValue('SplitterPosition') as TJSONNumber).AsInt;
+    TmpJson := RootJson.GetValue('SplitDirection');
+    if nil = TmpJson then Exit;
+    SplitDirection := TSplitDirection((TmpJson as TJSONNumber).AsInt);
+
+    TmpJson := RootJson.GetValue('SplitterPosition');
+    if nil = TmpJson then Exit;
+    SplitterPosition := (TmpJson as TJSONNumber).AsInt;
 
     // Deserialize LeftControl
-    ChildJSON := JSONObj.GetValue('LeftControl');
+    ChildJSON := RootJson.GetValue('LeftControl');
+    if nil = ChildJSON then Exit;
     if ChildJSON is TJSONObject then
     begin
       if TJSONObject(ChildJSON).GetValue('BufferID') <> nil then
@@ -116,7 +125,8 @@ begin
     end;
 
     // Deserialize RightControl
-    ChildJSON := JSONObj.GetValue('RightControl');
+    ChildJSON := RootJson.GetValue('RightControl');
+    if nil = ChildJSON then Exit;
     if ChildJSON is TJSONObject then
     begin
       if TJSONObject(ChildJSON).GetValue('BufferID') <> nil then
@@ -128,7 +138,7 @@ begin
       end;
     end;
   finally
-    JSONObj.Free;
+    RootJson.Free;
   end;
 
   Result := Self;

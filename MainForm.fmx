@@ -12,31 +12,52 @@ object frmStoneNotes: TfrmStoneNotes
   OnResize = FormResize
   DesignerMasterStyle = 0
   object btnSplitRight: TButton
-    Position.X = 555.000000000000000000
+    Position.X = 272.000000000000000000
     Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Split &Right'
     OnClick = btnSplitRightClick
+    object btnStyle: TButton
+      Position.X = 72.000000000000000000
+      Size.Width = 64.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'S&tyle'
+      OnClick = btnStyleClick
+    end
   end
   object btnSplitLeft: TButton
-    Position.X = 5.000000000000000000
+    Position.X = 205.000000000000000000
     Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
     TabOrder = 0
     Text = 'Split &Left'
     OnClick = btnSplitLeftClick
   end
   object btnSave: TButton
-    Position.X = 256.000000000000000000
+    Position.X = 5.000000000000000000
     Position.Y = 5.000000000000000000
-    TabOrder = 3
-    Text = '&Save Layout'
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Text = '&Save'
     OnClick = btnSaveClick
   end
   object btnOpen: TButton
-    Position.X = 344.000000000000000000
+    Position.X = 139.000000000000000000
     Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
     TabOrder = 2
-    Text = '&Open Layout'
+    Text = '&Open...'
     OnClick = btnOpenClick
   end
   object saveDlg: TSaveDialog
@@ -46,5 +67,15 @@ object frmStoneNotes: TfrmStoneNotes
   object openDlg: TOpenDialog
     Left = 368
     Top = 112
+  end
+  object btnSaveAs: TButton
+    Position.X = 72.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    Text = '&Save As...'
+    OnClick = btnSaveAsClick
   end
 end

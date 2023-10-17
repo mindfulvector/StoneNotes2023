@@ -242,6 +242,7 @@ begin
   if Assigned(FCommandControl) then
     FCommandControl.DisposeOf;
   FCommandControl := TMemo.Create(Self);
+  TMemo(FCommandControl).WordWrap := true;
   FCommandControl.Parent := Self;
   FCommandControl.Position.X := 10;
   FCommandControl.Position.Y := FGoButton.Height + 20;

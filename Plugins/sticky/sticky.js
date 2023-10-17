@@ -1,24 +1,29 @@
 $(document).ready(function(){
     // Load notes from localStorage or a default set
-    let notes = JSON.parse(localStorage.getItem('CorkNotes')) || [
-        { x: '10px', y: '40px', width: '150px', height: '80px', text: "This is the corkboard sticky notes plugin!"},
-        { x: '30px', y: '140px', width: '200px', height: '160px', text: "Notes are currently stored in local storage, not the StoneNotes layout file or database.<br><b>This means that they will be lost when StoneNotes is shutdown.</b><br>This is just a test plugin for now!"},
-    ];
+    PluginStorageService.readLayoutValue('CorkNotes', (notesJson) => {
+        console.log('loading notes callback');
+        var notes = [
+            { x: '10px', y: '40px', width: '150px', height: '80px', text: "This is the corkboard sticky notes plugin!"},
+            { x: '30px', y: '140px', width: '200px', height: '160px', text: "Notes are currently stored in local storage, not the StoneNotes layout file or database.<br><b>This means that they will be lost when StoneNotes is shutdown.</b><br>This is just a test plugin for now!"},
+        ];
 
-    //test
-
-    // Render loaded notes to page
-    for (let note of notes) {
-        const $noteDiv = $('<div></div>').addClass('sticky-note')
-                                         .css('left', note.x)
-                                         .css('top', note.y)
-                                         .css('width', note.width)
-                                         .css('height', note.height)
-                                         .html('<div class="draghandle"><button class="delete-note">X</button></div><div class="body">'+note.text+'</div>');
-        $('body').append($noteDiv);
-        $noteDiv.draggable({handle: '.draghandle'});
-        bindNoteEvents($noteDiv);
-    }
+        if(notesJson && notesJson[0] == '[') {
+            notes = JSON.parse(notesJson);
+        }
+        // Render loaded notes to page
+        for (let note of notes) {
+            console.log(note);
+            const $noteDiv = $('<div></div>').addClass('sticky-note')
+                                             .css('left', note.x)
+                                             .css('top', note.y)
+                                             .css('width', note.width)
+                                             .css('height', note.height)
+                                             .html('<div class="draghandle"><button class="delete-note">X</button></div><div class="body">'+note.text+'</div>');
+            $('body').append($noteDiv);
+            $noteDiv.draggable({handle: '.draghandle'});
+            bindNoteEvents($noteDiv);
+        }
+    });
 
     
 
@@ -151,11 +156,8 @@ function saveNotes() {
             text: $(this).find('.body').html()
         };
     }).get();
-    var storage = window.chrome.webview.hostObjects.sync.storageservice;
-    console.log('storage object', storage);
-    sendStorageServiceObjectMessage(JSON.stringify({'func': 'WriteLayoutValue', 'key': 'CorkNotes', 'value': savedNotes}));
-    storage.ObjectMessage = JSON.stringify({'func': 'WriteLayoutValue', 'key': 'CorkNotes', 'value': savedNotes});
-    console.log('saved notes', savedNotes);
+    console.log('CorkNotes to save: '+JSON.stringify(savedNotes));
+    PluginStorageService.writeLayoutValue('CorkNotes', JSON.stringify(savedNotes));
     localStorage.setItem('CorkNotes', JSON.stringify(savedNotes));
 }
 

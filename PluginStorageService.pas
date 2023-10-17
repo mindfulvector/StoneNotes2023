@@ -3,90 +3,128 @@ unit PluginStorageService;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, FMX.TMSFNCWebBrowser;
+  System.Classes, System.SysUtils, System.Rtti, System.JSON,
+  System.NetEncoding, System.StrUtils,
+  FMX.TMSFNCWebBrowser;
 
 type
-
-  TPluginStorageService = class(TInterfacedPersistent, ITMSFNCCustomWebBrowserBridge)
+  TPluginStorageService = class
   private
-    FValues: TStringList;
-    FObjectMessage: string;
-    function GetObjectMessage: string;
-    procedure SetObjectMessage(const Value: string);
-  protected
+    FLayoutValues: TStringList;
+    FWebBrowser: TTMSFNCWebBrowser;
   public
-    constructor Create;
-    destructor Destroy;
-
-    procedure WriteLayoutValue(AKey: String; AValue: String);
-    function ReadLayoutValue(AKey: String): String;
-
-    property Values: TStringList read FValues;
-  published
-    property ObjectMessage: string read GetObjectMessage write SetObjectMessage;
+    constructor Create(AWebBrowser: TTMSFNCWebBrowser);
+    procedure OnBeforeNavigate(Sender: TObject; var EventParams: TTMSFNCCustomWebBrowserBeforeNavigateParams);
+    function ExecuteMethod(const AMethodName: string; AParams: TArray<TValue>): string;
+    procedure WriteLayoutValue(AKey: string; AValue: string);
+    function ReadLayoutValue(AKey: string): string;
+    procedure SetAllLayoutValues(AValues: string);
+    function GetAllLayoutValues: string;
   end;
 
 implementation
 
-constructor TPluginStorageService.Create;
+constructor TPluginStorageService.Create(AWebBrowser: TTMSFNCWebBrowser);
 begin
-  inherited;
-  FValues := TStringList.Create;
+  inherited Create;
+  FLayoutValues := TStringList.Create;
+  FWebBrowser := AWebBrowser;
+  FWebBrowser.OnBeforeNavigate := OnBeforeNavigate;
 end;
 
-destructor TPluginStorageService.Destroy;
-begin
-  FValues.Free;
-  inherited;
-end;
-
-// Calls from JS are in the form of messages that we need to translate to
-// method calls manually.
-// Messages that return a value do so by setting the FObjectMessage field.
-procedure TPluginStorageService.SetObjectMessage(const Value: string);
+procedure TPluginStorageService.OnBeforeNavigate(Sender: TObject; var EventParams: TTMSFNCCustomWebBrowserBeforeNavigateParams);
 var
-  MsgValue: TJSONValue;
-  Msg: TJSONObject;
+  MethodName: string;
+  Params: TArray<TValue>;
+  Result: string;
+  ParamsString: string;
+  ParamsArray: TJSONArray;
+  I: Integer;
+  JobId: Integer;
+  URL: String;
+  StorageServicePrefix: String;
 begin
+  URL := EventParams.URL;
 
-  MsgValue := TJSONObject.ParseJSONValue(FObjectMessage);
-  try
-    if MsgValue is TJSONObject then
+  // Detect the file://storage-service prefix
+  StorageServicePrefix := 'file://storage-service';
+  if URL.StartsWith(StorageServicePrefix, True) then
+  begin
+    EventParams.Cancel := true;
+
+    // Parse the URL to extract the method name and parameters
+    var SplitString := URL.Substring(Length(StorageServicePrefix)+1).Split(['/']);  // Remove the prefix and split by '/'
+    if Length(SplitString) > 0 then
     begin
-      Msg := MsgValue as TJSONObject;
-
-      if Msg.Values['func'].Value = 'WriteLayoutValue' then
+      JobId := SplitString[0].ToInteger;
+      MethodName := SplitString[1];
+      if Length(SplitString) > 2 then
       begin
-        Self.WriteLayoutValue(Msg.Values['Key'].Value, Msg.Values['Value'].Value);
+        // URL decode remaining parameter strings (there will only be one unless there are forward slashes in a parameter)
+        for I := 2 to High(SplitString) do
+        begin
+          SplitString[I] := TNetEncoding.URL.Decode(SplitString[I]);
+          //SplitString[I] := ReplaceStr(SplitString[I], '\', '\\');
+        end;
+
+        // Combine all remaining indices to preserve forward slashes in ParamsString
+        ParamsString := String.Join('/', SplitString, 2, Length(SplitString) - 2);
+
+        // Parameters should be a Base64URL encoded JSON array
+        ParamsArray := TJSONObject.ParseJSONValue(TNetEncoding.Base64URL.Decode(ParamsString)) as TJSONArray;
+        SetLength(Params, ParamsArray.Count);
+        for I := 0 to ParamsArray.Count-1 do
+          Params[I] := TValue.From<string>(ParamsArray.Get(I).Value);
       end;
 
-      if Msg.Values['func'].Value = 'ReadLayoutValue' then
-      begin
-        FObjectMessage := Self.ReadLayoutValue(Msg.Values['Key'].Value);
-      end;
+      Result := ExecuteMethod(MethodName, Params);
+      // Send Result back to JavaScript, for example, through a callback…
+      FWebBrowser.ExecuteJavaScript(
+        Format('PluginStorageService.returnResult(%d, %s)', [JobId, QuotedStr(Result)])
+      );
     end;
-  finally
-    MsgValue.Free;
   end;
 end;
 
-function TPluginStorageService.GetObjectMessage: string;
+function TPluginStorageService.ExecuteMethod(const AMethodName: string; AParams: TArray<TValue>): string;
+var
+  RttiContext: TRttiContext;
+  RttiType: TRttiType;
+  RttiMethod: TRttiMethod;
 begin
-  Result := FObjectMessage;
+  RttiType := RttiContext.GetType(Self.ClassType);
+  RttiMethod := RttiType.GetMethod(AMethodName);
+  if Assigned(RttiMethod) then
+    Result := RttiMethod.Invoke(Self, AParams).ToString
+  else
+    Result := 'Method not found';
 end;
 
-// These methods are translated from messages, and can be used directly in
-// Delphi code to manipulate storage.
-procedure TPluginStorageService.WriteLayoutValue(AKey: String; AValue: String);
+
+// Called by Javascript to store a value that will be saved in the layout file
+procedure TPluginStorageService.WriteLayoutValue(AKey, AValue: string);
 begin
-  FValues.Values[AKey] := AValue;
+  FLayoutValues.Values[AKey] := AValue;
+
 end;
 
-function TPluginStorageService.ReadLayoutValue(AKey: String): String;
+// Called by Javascript to get a layout value
+function TPluginStorageService.ReadLayoutValue(AKey: string): string;
 begin
-  Result := FValues.Values[AKey];
+  Result := FLayoutValues.Values[AKey];
 end;
 
+// Called by serializer to set all the layout values for this plugin
+procedure TPluginStorageService.SetAllLayoutValues(AValues: string);
+begin
+  FLayoutValues.Text := AValues;
+end;
+
+// Called by serializer to get all layouts values stored by the plugin
+function TPluginStorageService.GetAllLayoutValues: string;
+begin
+  Result := FLayoutValues.Text;
+end;
 
 
 end.

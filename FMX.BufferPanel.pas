@@ -10,7 +10,7 @@ uses
   FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics,
   FMX.TMSFNCGraphicsTypes, FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser,
 
-  StringUtils, PluginManager;
+  StringUtils, PluginManager, PluginStorageService;
 
 type
   TBufferPanel = class(TPanel)
@@ -21,6 +21,7 @@ type
     FBufferIdLabel: TLabel;
     FBufferID: integer;
     FPluginManager: TPluginManager;
+    FPluginStorageService: TPluginStorageService;
     procedure GoButtonClick(Sender: TObject);
     procedure CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure CreateBrowser;
@@ -124,7 +125,9 @@ begin
     Properties := TMemo(FCommandControl).Text;
 
   if FCommandControl is TTMSFNCWebBrowser then
-    Properties := TTMSFNCWebBrowser(FCommandControl).URL;
+  begin
+    Properties := FPluginStorageService.GetAllLayoutValues;
+  end;
 end;
 
 // Restore properties to the buffer command component.
@@ -134,7 +137,10 @@ begin
     TMemo(FCommandControl).Text := SProperties;
 
   if FCommandControl is TTMSFNCWebBrowser then
-    TTMSFNCWebBrowser(FCommandControl).Navigate(SProperties);
+  begin
+    //TTMSFNCWebBrowser(FCommandControl).Navigate(SProperties);
+    FPluginStorageService.SetAllLayoutValues(SProperties);
+  end;
 end;
 
 // Note: Unlike other methods named in the pattern BufferCommand*, which
@@ -162,10 +168,10 @@ begin
         PluginPageHTML := Plugin.ReadFile(PluginPage);
 
         // Inject StorageService JS function
-        PluginPageHTML := ReplaceStr(PluginPageHTML, '</head>',
+        {PluginPageHTML := ReplaceStr(PluginPageHTML, '</head>',
           '<script>'
           +TTMSFNCWebBrowser(FCommandControl).GetBridgeCommunicationLayer('storageservice')
-          +'</script></head>');
+          +'</script></head>');}
 
         // Convert line endings to be consistent so we can use the JS debuffer
         PluginPageHTML := StandardizeLineEndings(PluginPageHTML);
@@ -197,6 +203,12 @@ begin
                             +Plugin.DirName
                             +'\eval_'
                             +PluginPage, '\', '/');
+
+        // Create storage service for this instance and install it
+        if Assigned(FPluginStorageService) then
+          FPluginStorageService.DisposeOf;
+
+        FPluginStorageService := TPluginStorageService.Create(TTMSFNCWebBrowser(FCommandControl));
 
         // Load it!
         TTMSFNCWebBrowser(FCommandControl).Navigate(FileURL);
@@ -260,12 +272,16 @@ begin
   if not (FCommandControl is TTMSFNCWebBrowser) then
   begin
     FCommandControl := TTMSFNCWebBrowser.Create(Self);
-    TTMSFNCWebBrowser(FCommandControl).AddBridge('StorageService', FPluginManager.GetStorageService);
     FCommandControl.Parent := Self;
     FCommandControl.Position.X := 10;
     FCommandControl.Position.Y := FGoButton.Height + 20;
     FCommandControl.Width := Width - 20;
     FCommandControl.Height := Height - FGoButton.Height - 30;
+  end;
+  if Assigned(FPluginStorageService) then
+  begin
+    FPluginStorageService.DisposeOf;
+    FPluginStorageService := nil;
   end;
   FCommandControl.SetFocus;
   TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');

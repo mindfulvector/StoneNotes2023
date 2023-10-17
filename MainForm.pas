@@ -26,6 +26,7 @@ type
     procedure FormDeactivate(Sender: TObject);
   private
     FSplitterPanel: TSplitterPanel;
+    //FSerializer: TSerializedSplitter;
     FLastSplitterRight: TSplitterPanel;
     FLastSplitterLeft: TSplitterPanel;
     FPluginManager: TPluginManager;
@@ -48,11 +49,15 @@ begin
   if openDlg.Execute then
   begin
     data := TFile.ReadAllText(openDlg.FileName);
-    Self.Caption := openDlg.FileName;
+    Self.Caption := 'StoneNotes Matrix - ' + ExtractFileName(openDlg.FileName);
     FLastSplitterRight := nil;
     FLastSplitterLeft := nil;
     FSplitterPanel.DisposeOf;
     FSplitterPanel := nil;
+    //if Assigned(FSerializer) then
+    //  FSerializer.Free;
+    //FSerializer := TSerializedSplitter.Create.FromString(data);
+    //FSplitterPanel := FSerializer.CreateSplitter(Self, FPluginManager);
     serializer := TSerializedSplitter.Create.FromString(data);
     FSplitterPanel := serializer.CreateSplitter(Self, FPluginManager);
     FSplitterPanel.Parent := Self;
@@ -73,7 +78,7 @@ begin
   if saveDlg.Execute then
   begin
     TFile.WriteAllText(saveDlg.FileName, data);
-    Self.Caption := saveDlg.FileName;
+    Self.Caption := 'StoneNotes Matrix - ' + ExtractFileName(saveDlg.FileName);
   end;
 
 end;

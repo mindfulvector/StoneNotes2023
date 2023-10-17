@@ -11,16 +11,8 @@
     <script src="D:\Dev\Projects\Embar\Projects\StoneNotes\Assets/jquery-3.6.4.min.js"></script>
     <script src="D:\Dev\Projects\Embar\Projects\StoneNotes\Assets/bootstrap-4.3.1.min.js"></script>
     <script src="D:\Dev\Projects\Embar\Projects\StoneNotes\Assets/jquery-ui-1.12.1.min.js"></script>
-<script>var sendstorageserviceObjectMessage = function(parameters) {
-  var v = parameters;
-if (!window.chrome || !window.chrome.webview || !window.chrome.webview.hostObjects || !window.chrome.webview.hostObjects.sync) {
-  return;
-}
-var obj = window.chrome.webview.hostObjects.sync.storageservice;
-  if (obj) {
-    obj.ObjectMessage = v;
-  }
-};</script></head>
+    <script src="D:\Dev\Projects\Embar\Projects\StoneNotes\Assets/PluginStorageService.js"></script>
+</head>
 <body>
     <canvas id="corkboardCanvas"></canvas>
     <button id="addNote">Add Note</button>

@@ -302,8 +302,6 @@ begin
 
     Self.Parent := nil;
 
-    // Splitter will eventually be disposed of
-    //frmStoneNotes.DisposeOfSplitter(Self);
     Self.DisposeOf;
   end;
 end;

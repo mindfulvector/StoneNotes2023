@@ -30,7 +30,6 @@ type
     btnSaveAs: TButton;
     btnStyle: TButton;
     btnNew: TButton;
-    tGarbageCollector: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure btnSplitRightClick(Sender: TObject);
@@ -43,7 +42,6 @@ type
     procedure btnNewClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
-    procedure tGarbageCollectorTimer(Sender: TObject);
   private
     FFilename: string;
     FGlobalLayoutValues: TStringList;
@@ -51,11 +49,9 @@ type
     FLastSplitterRight: TSplitterPanel;
     FLastSplitterLeft: TSplitterPanel;
     FPluginManager: TPluginManager;
-    FDisposeOfSplitters: TObjectList;
     procedure UpdateWindowCaption;
   public
     { Public declarations }
-    procedure DisposeOfSplitter(ASplitter: TSplitterPanel);
   published
     property LastSplitterRight: TSplitterPanel read FLastSplitterRight write FLastSplitterRight;
     property LastSplitterLeft: TSplitterPanel read FLastSplitterLeft write FLastSplitterLeft;
@@ -188,16 +184,11 @@ begin
   FGlobalLayoutValues.Values['Style'] := ModifyAndApplyStyleToForm(Self);
 end;
 
-procedure TfrmStoneNotes.DisposeOfSplitter(ASplitter: TSplitterPanel);
-begin
-  FDisposeOfSplitters.Add(ASplitter);
-end;
 
 procedure TfrmStoneNotes.FormCreate(Sender: TObject);
 var
   PluginCount: integer;
 begin
-  FDisposeOfSplitters := TObjectList.Create;
   FPluginManager := TPluginManager.Create;
   PluginCount := FPluginManager.LoadPlugins;
   if PluginCount = 0 then
@@ -241,12 +232,6 @@ begin
   FSplitterPanel.SetBounds(5, btnSplitRight.Height + 10, Self.Width - 25, Self.Height - 90);
 end;
 
-procedure TfrmStoneNotes.tGarbageCollectorTimer(Sender: TObject);
-begin
-  // Because the TObjectList owns the objects that have been added to it,
-  // it will destroy them upon clearing of the list.
-  FDisposeOfSplitters.Clear;
-end;
 
 end.
 

@@ -90,10 +90,4 @@ object frmStoneNotes: TfrmStoneNotes
     Text = 'S&tyle'
     OnClick = btnStyleClick
   end
-  object tGarbageCollector: TTimer
-    Interval = 5000
-    OnTimer = tGarbageCollectorTimer
-    Left = 312
-    Top = 112
-  end
 end

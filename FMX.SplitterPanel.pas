@@ -29,6 +29,7 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure SetSplitDirection(const Value: TSplitDirection);
     function SplitSide(ASide: TSide): TSplitterPanel;
+    procedure Unsplit(AKeepControl: TControl);
     procedure SetLeftControl(const Value: TControl);
     procedure SetRightControl(const Value: TControl);
   published
@@ -39,6 +40,9 @@ type
   end;
 
 implementation
+
+uses
+  MainForm;
 
 constructor TSplitterPanel.Create(AOwner: TComponent; APluginManager: TPluginManager);
 begin
@@ -82,7 +86,9 @@ begin
       FLeftControl := TBufferPanel.Create(Self, FPluginManager);
     end;
 
+    Self.InsertComponent(FLeftControl);
     FLeftControl.Parent := Self;
+
     Resize;
   end;
 end;
@@ -98,6 +104,7 @@ begin
       FRightControl := TBufferPanel.Create(Self, FPluginManager);
     end;
 
+    Self.InsertComponent(FRightControl);
     FRightControl.Parent := Self;
     Resize;
   end;
@@ -268,6 +275,37 @@ begin
   end;
   Resize;
   SplitSide := NewSplitterPanel;
+end;
+
+procedure TSplitterPanel.Unsplit(AKeepControl: TControl);
+var
+  parentPanel: TSplitterPanel;
+begin
+  // The root level splitter cannot be unsplit, so make sure the parent
+  // is another splitter, in which case we are not the root.
+  if Self.Parent is TSplitterPanel then
+  begin
+    parentPanel := TSplitterPanel(Self.Parent);
+    Self.Hide;
+
+    // Check if the splitter being closed is the last one opened, if so, replace
+    // it with it's parent.
+    if Self = frmStoneNotes.LastSplitterLeft then frmStoneNotes.LastSplitterLeft := parentPanel;
+    if Self = frmStoneNotes.LastSplitterRight then frmStoneNotes.LastSplitterRight := parentPanel;
+
+    // To "unsplit" we find what side of the parent splitter this splitter is
+    // on, and replace it with the buffer we wish to keep.
+    if Self = parentPanel.LeftControl then
+      parentPanel.SetLeftControl(AKeepControl)
+    else
+      parentPanel.SetRightControl(AKeepControl);
+
+    Self.Parent := nil;
+
+    // Splitter will eventually be disposed of
+    //frmStoneNotes.DisposeOfSplitter(Self);
+    Self.DisposeOf;
+  end;
 end;
 
 end.

@@ -18,11 +18,13 @@ type
     FCommandEdit: TEdit;
     FGoButton: TButton;
     FCommandControl: TControl;
+    FCloseButton: TButton;
     FBufferIdLabel: TLabel;
     FBufferID: integer;
     FPluginManager: TPluginManager;
     FPluginStorageService: TPluginStorageService;
     procedure GoButtonClick(Sender: TObject);
+    procedure CloseButtonClick(Sender: TObject);
     procedure CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure CreateBrowser;
     procedure BufferCommandMemo(command: TArray<System.string>);
@@ -30,6 +32,7 @@ type
     procedure ScanForPluginCmd(command: TArray<System.string>);
     procedure DisplayError(AMessage: String);
     procedure BufferCommandPluginEditor(command: TArray<System.string>);
+    procedure BufferCommandQuit(command: TArray<System.string>);
   protected
     procedure Resize; override;
   public
@@ -46,12 +49,17 @@ type
   end;
 
   procedure TriggerGoButton(BufferID: integer);
+  procedure TriggerCloseButton(BufferID: integer);
 
 implementation
+
+uses
+  FMX.SplitterPanel;
 
 var
   LastBufferID: Integer = 0;
   GoButtons: array of TButton;
+  CloseButtons: array of TButton;
 
 constructor TBufferPanel.Create(AOwner: TComponent; APluginManager: TPluginManager);
 begin
@@ -85,13 +93,27 @@ begin
   if Length(GoButtons) < LastBufferID+1 then SetLength(GoButtons, LastBufferID+1);
   GoButtons[LastBufferID] := FGoButton;
 
+  FCloseButton := TButton.Create(Self);
+  FCloseButton.Parent := Self;
+  FCloseButton.Width := 30;
+  FCloseButton.Height := 22;
+  FCloseButton.Text := ':Q';
+  FCloseButton.Position.X := Self.Width - FCloseButton.Width;
+  FCloseButton.Position.Y := 0;
+
   FCommandEdit.OnKeyDown := CommandEditKeyDown;
   FGoButton.OnClick := GoButtonClick;
+  FCloseButton.OnClick := CloseButtonClick;
 end;
 
 procedure TriggerGoButton(BufferID: integer);
 begin
   if BufferID < Length(GoButtons) then GoButtons[BufferID].OnClick(GoButtons[BufferID]);
+end;
+
+procedure TriggerCloseButton(BufferID: integer);
+begin
+  if BufferID < Length(CloseButtons) then CloseButtons[BufferID].OnClick(CloseButtons[BufferID]);
 end;
 
 // Buffer ID is a session-unique integer that identifies this buffer.
@@ -117,6 +139,13 @@ begin
 end;
 
 // Retrieves the last entered command.
+procedure TBufferPanel.CloseButtonClick(Sender: TObject);
+begin
+  FCommandEdit.Text := ':Q';
+  FCommandEdit.SetFocus;
+  GoButtonClick(FGoButton);
+end;
+
 function TBufferPanel.Command: string;
 begin
   Command := FCommandEdit.Text;
@@ -249,6 +278,18 @@ begin
   end;
 end;
 
+procedure TBufferPanel.BufferCommandQuit(command: TArray<System.string>);
+begin
+  with TSplitterPanel(Self.Parent) do
+  begin
+    if Self = LeftControl then
+      Unsplit(RightControl)
+    else if Self = RightControl then
+      Unsplit(LeftControl);
+  end;
+
+end;
+
 // B - Basic web browser
 procedure TBufferPanel.BufferCommandBrowser(command: TArray<System.string>);
 begin
@@ -347,6 +388,8 @@ begin
           {h}FCommandEdit.Height);
   FGoButton.Position.X := Width - FGoButton.Width - 10;
 
+  FCloseButton.Position.X := Self.Width - FCloseButton.Width;
+
   // Resize the component
   if Assigned(FCommandControl) then
     FCommandControl.SetBounds(
@@ -379,6 +422,7 @@ begin
     // Spawn command controls from command entry...
 
     // Check built-in commands first
+    if command[0] = ':Q' then begin BufferCommandQuit(command); Exit; end;
     if command[0] = 'M' then BufferCommandMemo(command);
     if command[0] = 'B' then BufferCommandBrowser(command);
     if command[0] = 'EPLG' then BufferCommandPluginEditor(command);

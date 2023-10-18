@@ -1,1 +1,16 @@
-{"SplitDirection":0,"SplitterPosition":50,"LeftControl":{"BufferID":1,"CommandType":"","Properties":""},"RightControl":{"BufferID":2,"CommandType":"STIC","Properties":"CorkNotes=[{\"x\":\"10px\",\"y\":\"40px\",\"width\":\"150px\",\"height\":\"80px\",\"text\":\"This is the corkboard sticky notes plugin!\"},{\"x\":\"30px\",\"y\":\"140px\",\"width\":\"200px\",\"height\":\"160px\",\"text\":\"Notes in the latest version are now saved to the layout file!\"}]\r\n"}}
+{
+    "SplitDirection": 0,
+    "SplitterPosition": 50,
+    "LeftControl": {
+        "BufferID": 1,
+        "CommandType": "",
+        "Properties": ""
+    },
+    "RightControl": {
+        "BufferID": 2,
+        "CommandType": "STIC",
+        "Properties": "CorkNotes=[{\"x\":\"10px\",\"y\":\"40px\",\"width\":\"150px\",\"height\":\"80px\",\"text\":\"This is the corkboard sticky notes plugin!\"},{\"x\":\"30px\",\"y\":\"140px\",\"width\":\"200px\",\"height\":\"160px\",\"text\":\"Notes in the latest version are now saved to the layout file!\"}]\r\n"
+    },
+    "GlobalValues": {
+    }
+}

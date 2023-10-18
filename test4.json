@@ -1,1 +1,16 @@
-{"SplitDirection":0,"SplitterPosition":50,"LeftControl":{"BufferID":1,"CommandType":"B","Properties":"https:\/\/www.pythonanywhere.com\/"},"RightControl":{"BufferID":2,"CommandType":"M","Properties":"Memo for buffer 2"}}
+{
+    "SplitDirection": 0,
+    "SplitterPosition": 50,
+    "LeftControl": {
+        "BufferID": 1,
+        "CommandType": "B",
+        "Properties": ""
+    },
+    "RightControl": {
+        "BufferID": 2,
+        "CommandType": "M",
+        "Properties": "Memo for buffer 2"
+    },
+    "GlobalValues": {
+    }
+}

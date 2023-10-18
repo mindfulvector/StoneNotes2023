@@ -1,1 +1,16 @@
-{"SplitDirection":0,"SplitterPosition":50,"LeftControl":{"BufferID":1,"CommandType":"B google.com","Properties":""},"RightControl":{"BufferID":2,"CommandType":"B https:\/\/stonenotes.com","Properties":""}}
+{
+    "SplitDirection": 0,
+    "SplitterPosition": 50,
+    "LeftControl": {
+        "BufferID": 1,
+        "CommandType": "B google.com",
+        "Properties": ""
+    },
+    "RightControl": {
+        "BufferID": 2,
+        "CommandType": "B https:\/\/stonenotes.com",
+        "Properties": ""
+    },
+    "GlobalValues": {
+    }
+}

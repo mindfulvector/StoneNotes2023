@@ -14,14 +14,15 @@ type
     SplitterPosition: Integer;
     LeftControl: TObject;  // Will hold either TSerializedSplitter or TSerializedBuffer
     RightControl: TObject;
+    FGlobalLayoutValues: TStringList;
   public
     constructor Create; overload;
-    constructor Create(ASplitterPanel: TSplitterPanel); overload;
+    constructor Create(ASplitterPanel: TSplitterPanel; AGlobalLayoutValues: TStringList); overload;
 
     function ToString: string;
     function FromString(const AJSONStr: string): TSerializedSplitter;
     function CreateSplitter(AOwner: TFMXObject; APluginManager: TPluginManager): TSplitterPanel;
-
+    property GlobalLayoutValues: TStringList read FGlobalLayoutValues write FGlobalLayoutValues;
   end;
 
   TSerializedBuffer = class
@@ -46,22 +47,25 @@ begin
   SplitterPosition := 0;
   LeftControl := nil;
   RightControl := nil;
+  FGlobalLayoutValues := nil;
 end;
 
-constructor TSerializedSplitter.Create(ASplitterPanel: TSplitterPanel);
+constructor TSerializedSplitter.Create(ASplitterPanel: TSplitterPanel; AGlobalLayoutValues: TStringList);
 begin
   inherited Create;
 
+  FGlobalLayoutValues := AGlobalLayoutValues;
   SplitDirection := ASplitterPanel.SplitDirection;
   SplitterPosition := ASplitterPanel.SplitterPosition;
 
   if ASplitterPanel.LeftControl is TSplitterPanel then
-    LeftControl := TSerializedSplitter.Create(TSplitterPanel(ASplitterPanel.LeftControl))
+    // Passing nil as AGlobalLayoutValues so values aren't resaved under every splitter obj
+    LeftControl := TSerializedSplitter.Create(TSplitterPanel(ASplitterPanel.LeftControl), nil)
   else if ASplitterPanel.LeftControl is TBufferPanel then
     LeftControl := TSerializedBuffer.Create(TBufferPanel(ASplitterPanel.LeftControl));
 
   if ASplitterPanel.RightControl is TSplitterPanel then
-    RightControl := TSerializedSplitter.Create(TSplitterPanel(ASplitterPanel.RightControl))
+    RightControl := TSerializedSplitter.Create(TSplitterPanel(ASplitterPanel.RightControl), nil)
   else if ASplitterPanel.RightControl is TBufferPanel then
     RightControl := TSerializedBuffer.Create(TBufferPanel(ASplitterPanel.RightControl));
 end;
@@ -70,8 +74,11 @@ end;
 function TSerializedSplitter.ToString: string;
 var
   JSONObj: TJSONObject;
+  JSONGlobalLayoutValues: TJSONObject;
+  I: integer;
 begin
   JSONObj := TJSONObject.Create;
+  JSONGlobalLayoutValues := nil;
   try
     JSONObj.AddPair('SplitDirection', TJSONNumber.Create(Ord(SplitDirection)));
     JSONObj.AddPair('SplitterPosition', TJSONNumber.Create(SplitterPosition));
@@ -86,7 +93,19 @@ begin
     else
       JSONObj.AddPair('RightControl', TJSONObject.ParseJSONValue(TSerializedBuffer(RightControl as TSerializedBuffer).ToJSON));
 
-    Result := JSONObj.ToString;
+    if nil <> FGlobalLayoutValues then
+    begin
+      JSONGlobalLayoutValues := TJSONObject.Create;
+     // try
+        for I := 0 to FGlobalLayoutValues.Count-1 do
+          JSONGlobalLayoutValues.AddPair(FGlobalLayoutValues.KeyNames[I], FGlobalLayoutValues.ValueFromIndex[I]);
+        JSONObj.AddPair('GlobalValues', JSONGlobalLayoutValues);
+     // finally
+     //   JSONGlobalLayoutValues.Free;
+     // end;
+    end;
+
+    Result := JSONObj.Format;
   finally
     JSONObj.Free;
   end;
@@ -97,11 +116,24 @@ var
   RootJson: TJSONObject;
   TmpJson: TJSONValue;
   ChildJSON: TJSONValue;
+  GlobalPair: TJSONPair;
 begin
   Result := nil;
   RootJson := TJSONObject.ParseJSONValue(AJSONStr) as TJSONObject;
   if nil = RootJson then Exit;
   try
+    TmpJson := RootJson.GetValue('GlobalValues');
+    if nil <> TmpJson then
+    begin
+      if nil = FGlobalLayoutValues then FGlobalLayoutValues := TStringList.Create
+      else FGlobalLayoutValues.Clear;
+      if TmpJson is TJSONObject then
+        for GlobalPair in TJSONObject(TmpJson) do
+        begin
+          FGlobalLayoutValues.Add(GlobalPair.JsonString.Value+'='+GlobalPair.JsonValue.Value)
+        end;
+    end;
+
     TmpJson := RootJson.GetValue('SplitDirection');
     if nil = TmpJson then Exit;
     SplitDirection := TSplitDirection((TmpJson as TJSONNumber).AsInt);

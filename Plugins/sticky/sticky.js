@@ -8,8 +8,14 @@ $(document).ready(function(){
         ];
 
         if(notesJson && notesJson[0] == '[') {
+            console.log('Got notes from storage:'+notesJson);
             notes = JSON.parse(notesJson);
+        } else {
+            console.log('No notes in storage');
         }
+
+        console.log('notes to display:', notes);
+
         // Render loaded notes to page
         for (let note of notes) {
             console.log(note);

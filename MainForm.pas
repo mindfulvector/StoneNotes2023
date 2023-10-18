@@ -1,11 +1,11 @@
-unit MainForm;
+﻿unit MainForm;
 
 interface
 
 uses
   {system}
-  System.SysUtils, System.Types, System.UITypes, System.Classes,
-  System.IOUtils,
+  Windows, System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.IOUtils, System.StrUtils, ShellApi,
 
   {framework}
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
@@ -14,10 +14,10 @@ uses
   FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser, FMX.Styles,
 
   {custom FMX compnents}
-  FMX.SplitterPanel,
+  FMX.SplitterPanel, FMX.BufferPanel,
 
   {other custom classes}
-  SplitterSerializer, PluginManager, Logger, StyleMaker;
+  SplitterSerializer, PluginManager, Logger, StyleMaker, StringUtils;
 
 type
   TfrmStoneNotes = class(TForm)
@@ -29,6 +29,7 @@ type
     btnOpen: TButton;
     btnSaveAs: TButton;
     btnStyle: TButton;
+    btnNew: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure btnSplitRightClick(Sender: TObject);
@@ -38,8 +39,12 @@ type
     procedure FormDeactivate(Sender: TObject);
     procedure btnSaveAsClick(Sender: TObject);
     procedure btnStyleClick(Sender: TObject);
+    procedure btnNewClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
   private
     FFilename: string;
+    FGlobalLayoutValues: TStringList;
     FSplitterPanel: TSplitterPanel;
     FLastSplitterRight: TSplitterPanel;
     FLastSplitterLeft: TSplitterPanel;
@@ -56,11 +61,22 @@ implementation
 
 {$R *.fmx}
 
+procedure TfrmStoneNotes.btnNewClick(Sender: TObject);
+var
+  s: string;
+begin
+  s := ParamStr(0);
+  ShellExecute(0, 'open', PChar(s), nil, nil, SW_SHOW);
+end;
+
 procedure TfrmStoneNotes.btnOpenClick(Sender: TObject);
 var
   serializer: TSerializedSplitter;
   NewSplitterPanel: TSplitterPanel;
   data: string;
+  style: string;
+  TmpStyleFile: string;
+  compressedStyleArray: TStringDynArray;
 begin
   if openDlg.Execute then
   begin
@@ -83,13 +99,29 @@ begin
         ShowMessage('Invalid layout file, could not create a splitter from the JSON data: ' + openDlg.FileName)
       else
       begin
+        FGlobalLayoutValues := serializer.GlobalLayoutValues;
+        if nil = FGlobalLayoutValues then FGlobalLayoutValues := TStringList.Create;
+        
         FLastSplitterRight := nil;
         FLastSplitterLeft := nil;
-        FSplitterPanel.DisposeOf;
+        FSplitterPanel.Free;
+        FSplitterPanel := nil;
         FSplitterPanel := NewSplitterPanel;
         FSplitterPanel.Parent := Self;
         FLastSplitterRight := FSplitterPanel;
         FLastSplitterLeft := FSplitterPanel;
+        if Assigned(FGlobalLayoutValues) then
+        begin
+          style := FGlobalLayoutValues.Values['Style'];
+          if '' <> style then
+          begin
+            style := DecompressString(style);
+            TmpStyleFile := 'C:\ProgramData\StoneNotes\Style_'+ExtractFileName(FFilename)+'.style';
+            TFile.WriteAllText(TmpStyleFile, style);
+            TStyleManager.SetStyleFromFile(TmpStyleFile);
+          end;
+        end;
+
         Resize;
       end;
     end;
@@ -97,7 +129,6 @@ begin
 end;
 
 procedure TfrmStoneNotes.btnSaveAsClick(Sender: TObject);
-
 begin
   if saveDlg.Execute and ('' <> saveDlg.FileName) then
   begin
@@ -120,7 +151,7 @@ var
   data: string;
 begin
   if '' <> FFilename then begin
-    serializer := TSerializedSplitter.Create(FSplitterPanel);
+    serializer := TSerializedSplitter.Create(FSplitterPanel, FGlobalLayoutValues);
     data := serializer.ToString;
     TFile.WriteAllText(FFilename, data);
     UpdateWindowCaption;
@@ -142,8 +173,10 @@ begin
 end;
 
 procedure TfrmStoneNotes.btnStyleClick(Sender: TObject);
+var
+  StyleText: string;
 begin
-  ModifyAndApplyStyleToForm(Self);
+  FGlobalLayoutValues.Values['Style'] := CompressString(ModifyAndApplyStyleToForm(Self));
 end;
 
 procedure TfrmStoneNotes.FormCreate(Sender: TObject);
@@ -159,6 +192,7 @@ begin
     Logger.Log(Format('Loaded %d plugins.', [PluginCount]));
   end;
 
+  FGlobalLayoutValues := TStringList.Create;
   FSplitterPanel := TSplitterPanel.Create(Self, FPluginManager);
   FSplitterPanel.Parent := Self;
   FSplitterPanel.SetLeftControl(nil);
@@ -171,6 +205,20 @@ end;
 procedure TfrmStoneNotes.FormDeactivate(Sender: TObject);
 begin
   Logger.FlushLogBuffer;
+end;
+
+procedure TfrmStoneNotes.FormKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+var
+  I: integer;
+begin
+  for I := 0 to 9 do
+    if (Key = vk1+I) and (ssAlt in Shift) then
+      begin
+        Key := 0;
+        KeyChar := #0;
+        TriggerGoButton(1+I);
+      end;
 end;
 
 procedure TfrmStoneNotes.FormResize(Sender: TObject);

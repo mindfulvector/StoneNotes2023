@@ -1,11 +1,11 @@
-unit StyleMaker;
+﻿unit StyleMaker;
 
 interface
 
 uses
   {system}
   System.SysUtils, System.Types, System.UITypes, System.Classes,
-  System.IOUtils, System.UIConsts, System.Rtti,
+  System.IOUtils, System.UIConsts, System.Rtti, System.StrUtils,
 
   {framework}
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
@@ -15,13 +15,15 @@ uses
   {custom}
   InputQueryDropdown;
 
-procedure ModifyAndApplyStyleToForm(AForm: TCommonCustomForm);
+function ModifyAndApplyStyleToForm(AForm: TCommonCustomForm): string;
 function AdjustColor(const AColor: TAlphaColor; const Amount: Single): TAlphaColor;
 procedure CreateModifiedStyle(const SourceStyleFile: string; const DestStyleFile: string);
 
 implementation
 
-procedure ModifyAndApplyStyleToForm(AForm: TCommonCustomForm);
+// Allows user to pick a form style, and optionally randomize it, then returns
+// the resulting style as a string for saving.
+function ModifyAndApplyStyleToForm(AForm: TCommonCustomForm): string;
 var
   StylesArray: TStringDynArray;
   StylesList: TStringList;
@@ -30,7 +32,10 @@ var
   I: Integer;
   dlgResult: TModalResult;
   StylesDir: string;
+  IterCount: Integer;
+  StyleValid: boolean;
 begin
+  Result := '';
   StylesList := TStringList.Create;
   try
     // Scan for .style files in the application directory
@@ -52,22 +57,55 @@ begin
                           [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel], 0)
         else
           dlgResult := mrNo;
-        case dlgResult of
-          mrYes: begin      // Modify style first
-            // Define a path to save the modified style
-            ModifiedStyleFile := ChosenStyle + '_modified.style';
+        repeat
+          case dlgResult of
+            mrYes: begin      // Modify style first
+              // Define a path to save the modified style
+              ModifiedStyleFile := ChosenStyle + '_modified.style';
 
-            // Modify the chosen style and save it to ModifiedStyleFile
-            CreateModifiedStyle(ChosenStyle, ModifiedStyleFile);
+              // Modify the chosen style and save it to ModifiedStyleFile
+              CreateModifiedStyle(ChosenStyle, ModifiedStyleFile);
+              IterCount := 1;
+              StyleValid := False;
 
-            // Apply the new style to the current form
-            TStyleManager.SetStyleFromFile(ModifiedStyleFile);
+              // Apply the new style to the current form
+              repeat
+                try
+                  TStyleManager.SetStyleFromFile(ModifiedStyleFile);
+
+                  // If we get here then the style did not cause an EReadError
+                  // and is therefore valid.
+                  StyleValid := true;
+
+                  Result := TFile.ReadAllText(ModifiedStyleFile);
+                except on EReadError do begin
+                    // If we get here then the style could not be read, some
+                    // color is likely out of range, etc. So we need to try
+                    // again, unless we have run out of attempts.
+                    if IterCount < 100 then
+                    begin
+                      CreateModifiedStyle(ChosenStyle, ModifiedStyleFile);
+                      Result := TFile.ReadAllText(ModifiedStyleFile);
+                      Inc(IterCount);
+                    end else begin
+                      TStyleManager.SetStyleFromFile(ChosenStyle);
+                      ShowMessage('Unable to generate new style, out of iterations. Please try again.');
+                    end;
+                  end;
+                end;
+              until StyleValid;
+
+
+            end;
+            mrNo: begin       // Use style as-is
+               TStyleManager.SetStyleFromFile(ChosenStyle);
+               Result := TFile.ReadAllText(ChosenStyle);
+            end;
+            mrCancel: ;       // Do nothing
           end;
-          mrNo: begin       // Use style as-is
-             TStyleManager.SetStyleFromFile(ChosenStyle);
-          end;
-          mrCancel: ;       // Do nothing
-        end;
+          dlgResult := MessageDlg('Do you want to modify the style again?', TMsgDlgType.mtConfirmation,
+                          [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0)
+        until dlgResult <> mrYes;
       end;
     end else begin
       ShowMessage('No styles found.');
@@ -160,8 +198,6 @@ begin
     StyleList.Free;
   end;
 end;
-
-
 
 end.
 

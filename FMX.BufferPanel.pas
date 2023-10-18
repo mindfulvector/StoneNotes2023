@@ -10,7 +10,7 @@ uses
   FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics,
   FMX.TMSFNCGraphicsTypes, FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser,
 
-  StringUtils, PluginManager, PluginStorageService;
+  StringUtils, PluginManager, PluginStorageService, PluginEditor;
 
 type
   TBufferPanel = class(TPanel)
@@ -29,6 +29,7 @@ type
     procedure BufferCommandBrowser(command: TArray<System.string>);
     procedure ScanForPluginCmd(command: TArray<System.string>);
     procedure DisplayError(AMessage: String);
+    procedure BufferCommandPluginEditor(command: TArray<System.string>);
   protected
     procedure Resize; override;
   public
@@ -44,10 +45,13 @@ type
     procedure SetProperties(SProperties: string);
   end;
 
+  procedure TriggerGoButton(BufferID: integer);
+
 implementation
 
 var
   LastBufferID: Integer = 0;
+  GoButtons: array of TButton;
 
 constructor TBufferPanel.Create(AOwner: TComponent; APluginManager: TPluginManager);
 begin
@@ -74,12 +78,20 @@ begin
   FGoButton.Parent := Self;
   FGoButton.Width := 50;
   FGoButton.Height := 22;
-  FGoButton.Text := 'Go ' + IntToStr(LastBufferID);
+  FGoButton.Text := 'Go &' + IntToStr(LastBufferID);
   FGoButton.Position.X := FCommandEdit.Width + 20;
   FGoButton.Position.Y := FCommandEdit.Position.Y;
 
+  if Length(GoButtons) < LastBufferID+1 then SetLength(GoButtons, LastBufferID+1);
+  GoButtons[LastBufferID] := FGoButton;
+
   FCommandEdit.OnKeyDown := CommandEditKeyDown;
   FGoButton.OnClick := GoButtonClick;
+end;
+
+procedure TriggerGoButton(BufferID: integer);
+begin
+  if BufferID < Length(GoButtons) then GoButtons[BufferID].OnClick(GoButtons[BufferID]);
 end;
 
 // Buffer ID is a session-unique integer that identifies this buffer.
@@ -101,7 +113,7 @@ begin
 
   FBufferID := ABufferID;
   FBufferIdLabel.Text := 'Buffer ID: ' + IntToStr(FBufferID);
-  FGoButton.Text := 'Go ' + IntToStr(FBufferID);
+  FGoButton.Text := 'Go &' + IntToStr(FBufferID);
 end;
 
 // Retrieves the last entered command.
@@ -114,6 +126,7 @@ end;
 procedure TBufferPanel.SetCommand(SCommand: string);
 begin
   FCommandEdit.Text := SCommand;
+  FCommandEdit.SetFocus;
   GoButtonClick(FGoButton);
 end;
 
@@ -126,7 +139,8 @@ begin
 
   if FCommandControl is TTMSFNCWebBrowser then
   begin
-    Properties := FPluginStorageService.GetAllLayoutValues;
+    if Assigned(FPluginStorageService) then
+      Properties := FPluginStorageService.GetAllLayoutValues;
   end;
 end;
 
@@ -138,8 +152,8 @@ begin
 
   if FCommandControl is TTMSFNCWebBrowser then
   begin
-    //TTMSFNCWebBrowser(FCommandControl).Navigate(SProperties);
-    FPluginStorageService.SetAllLayoutValues(SProperties);
+    if Assigned(FPluginStorageService) then
+      FPluginStorageService.SetAllLayoutValues(SProperties);
   end;
 end;
 
@@ -252,6 +266,23 @@ begin
   Resize;
 end;
 
+// EPLG - Plugin editor
+procedure TBufferPanel.BufferCommandPluginEditor(command: TArray<System.string>);
+begin
+  if Assigned(FCommandControl) then
+    FCommandControl.DisposeOf;
+  FCommandControl := TPluginEditor.Create(Self);
+  FCommandControl.Parent := Self;
+  FCommandControl.Position.X := 10;
+  FCommandControl.Position.Y := FGoButton.Height + 20;
+  FCommandControl.Width := Width - 20;
+  FCommandControl.Height := Height - FGoButton.Height - 30;
+  FCommandControl.SetFocus;
+  Resize;
+end;
+
+
+
 // Error display helper
 procedure TBufferPanel.DisplayError(AMessage: String);
 begin
@@ -315,34 +346,40 @@ procedure TBufferPanel.GoButtonClick(Sender: TObject);
 var
   command: TStringDynArray;
 begin
-  command := SplitString(FCommandEdit.Text);
-  if Length(command) = 0 then
+  if FCommandEdit.IsFocused then
   begin
-    if Assigned(FCommandControl) then
-      FCommandControl.DisposeOf;
-    FCommandControl := nil;
-    Exit;
+    command := SplitString(FCommandEdit.Text);
+    if Length(command) = 0 then
+    begin
+      if Assigned(FCommandControl) then
+        FCommandControl.DisposeOf;
+      FCommandControl := nil;
+      Exit;
+    end;
+    // Commands are setup internally in uppercase
+    command[0] := UpperCase(command[0]);
+
+    // Place back into command field to uppsercase the command
+    FCommandEdit.Text := JoinString(command);
+
+    // Spawn command controls from command entry...
+
+    // Check built-in commands first
+    if command[0] = 'M' then BufferCommandMemo(command);
+    if command[0] = 'B' then BufferCommandBrowser(command);
+    if command[0] = 'EPLG' then BufferCommandPluginEditor(command);
+
+    // Scan for plugin commands
+    if nil = FCommandControl then ScanForPluginCmd(command);
+
+    // Invalid command, bummer!
+    if nil = FCommandControl then DisplayError('Error: Unknown command.');
+
+    // Prepare to enter new command
+    FCommandEdit.SelectAll;
+  end else begin
+    FCommandEdit.SetFocus;
   end;
-  // Commands are setup internally in uppercase
-  command[0] := UpperCase(command[0]);
-
-  // Place back into command field to uppsercase the command
-  FCommandEdit.Text := JoinString(command);
-
-  // Spawn command controls from command entry...
-
-  // Check built-in commands first
-  if command[0] = 'M' then BufferCommandMemo(command);
-  if command[0] = 'B' then BufferCommandBrowser(command);
-
-  // Scan for plugin commands
-  if nil = FCommandControl then ScanForPluginCmd(command);
-
-  // Invalid command, bummer!
-  if nil = FCommandControl then DisplayError('Error: Unknown command.');
-
-  // Prepare to enter new command
-  FCommandEdit.SelectAll;
 end;
 
 procedure TBufferPanel.CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);

@@ -10,7 +10,9 @@ uses
   PluginManager in 'PluginManager.pas',
   Logger in 'Logger.pas',
   StringUtils in 'StringUtils.pas',
-  PluginStorageService in 'PluginStorageService.pas';
+  PluginStorageService in 'PluginStorageService.pas',
+  StyleMaker in 'StyleMaker.pas',
+  InputQueryDropdown in 'InputQueryDropdown.pas';
 
 {$R *.res}
 

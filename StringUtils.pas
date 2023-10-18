@@ -3,17 +3,18 @@ unit StringUtils;
 interface
 
 uses
-  System.Types;
+  System.Types, System.SysUtils, System.ZLib, System.NetEncoding,
+  System.RegularExpressions, System.Classes;
 
 function SplitString(const AInput: string): TStringDynArray;
 function JoinString(const Arr: TStringDynArray): string;
 function EscapeString(const s: string): string;
 function StandardizeLineEndings(const S: string): string;
 
-implementation
+function CompressString(const AString: string): string;
+function DecompressString(const AString: string): string;
 
-uses
-  System.SysUtils, System.RegularExpressions;
+implementation
 
 function SplitString(const AInput: string): TStringDynArray;
 var
@@ -135,6 +136,57 @@ begin
 
   // Replace LF with CR+LF.
   Result := StringReplace(Result, #10, #13#10, [rfReplaceAll]);
+end;
+
+function CompressString(const AString: string): string;
+var
+  Input, Output: TBytesStream;
+  Compressor: TZCompressionStream;
+begin
+  Input := TBytesStream.Create(TEncoding.UTF8.GetBytes(AString));
+  try
+    Output := TBytesStream.Create;
+    try
+      Compressor := TZCompressionStream.Create(Output);
+      try
+        Compressor.CopyFrom(Input, Input.Size);
+      finally
+        Compressor.Free;
+      end;
+      Result := TNetEncoding.Base64.EncodeBytesToString(Output.Bytes);
+    finally
+      Output.Free;
+    end;
+  finally
+    Input.Free;
+  end;
+end;
+
+function DecompressString(const AString: string): string;
+var
+  Input, Output: TBytesStream;
+  Decompressor: TZDecompressionStream;
+  DecodedBytes: TBytes;
+begin
+  DecodedBytes := TNetEncoding.Base64.DecodeStringToBytes(AString);
+  Input := TBytesStream.Create(DecodedBytes);
+  try
+    Output := TBytesStream.Create;
+    try
+      Decompressor := TZDecompressionStream.Create(Input);
+      try
+        Output.CopyFrom(Decompressor, 0);
+      finally
+        Decompressor.Free;
+      end;
+      Result := TEncoding.UTF8.GetString(Output.Bytes, 0, Output.Size);
+    finally
+      Output.Free;
+    end;
+  except
+    Result := AString;
+  end;
+  Input.Free;
 end;
 
 end.

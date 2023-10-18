@@ -136,6 +136,8 @@
         <DCCReference Include="Logger.pas"/>
         <DCCReference Include="StringUtils.pas"/>
         <DCCReference Include="PluginStorageService.pas"/>
+        <DCCReference Include="StyleMaker.pas"/>
+        <DCCReference Include="InputQueryDropdown.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

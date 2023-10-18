@@ -123,7 +123,8 @@ end;
 // Called by serializer to get all layouts values stored by the plugin
 function TPluginStorageService.GetAllLayoutValues: string;
 begin
-  Result := FLayoutValues.Text;
+  if Assigned(FLayoutValues) then
+    Result := FLayoutValues.Text;
 end;
 
 

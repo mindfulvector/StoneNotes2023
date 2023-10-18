@@ -1,15 +1,21 @@
 $(document).ready(function(){
     // Load notes from localStorage or a default set
     PluginStorageService.readLayoutValue('CorkNotes', (notesJson) => {
-        console.log('loading notes callback');
+        console.log('loading notes callback, reply:' + notesJson);
         var notes = [
             { x: '10px', y: '40px', width: '150px', height: '80px', text: "This is the corkboard sticky notes plugin!"},
             { x: '30px', y: '140px', width: '200px', height: '160px', text: "Notes are currently stored in local storage, not the StoneNotes layout file or database.<br><b>This means that they will be lost when StoneNotes is shutdown.</b><br>This is just a test plugin for now!"},
         ];
 
         if(notesJson && notesJson[0] == '[') {
-            console.log('Got notes from storage:'+notesJson);
-            notes = JSON.parse(notesJson);
+            console.log('Got notes from storage, str looks like an array');
+            try {
+              notes = JSON.parse(notesJson);  // Ensure jsonString is a well-formed JSON string
+            } catch (e) {
+              console.error('unable to parse notes from storage!');
+              console.error(e);
+            }
+            console.log('Parsed notes');
         } else {
             console.log('No notes in storage');
         }

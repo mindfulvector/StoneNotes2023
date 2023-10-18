@@ -148,12 +148,16 @@ end;
 procedure TBufferPanel.SetProperties(SProperties: string);
 begin
   if FCommandControl is TMemo then
+  begin
     TMemo(FCommandControl).Text := SProperties;
+  end;
 
   if FCommandControl is TTMSFNCWebBrowser then
   begin
     if Assigned(FPluginStorageService) then
-      FPluginStorageService.SetAllLayoutValues(SProperties);
+    begin
+      FPluginStorageService.SetAllLayoutValues(SProperties)
+    end;
   end;
 end;
 
@@ -219,10 +223,20 @@ begin
                             +PluginPage, '\', '/');
 
         // Create storage service for this instance and install it
+        // First check if we already have a storage service and dispose of it if
+        // it isn't for this command. It will already be setup for us mainly
+        // in the event of reloading an existing command panel, or when loading
+        // a layout file.
         if Assigned(FPluginStorageService) then
-          FPluginStorageService.DisposeOf;
+          if FPluginStorageService.ForPluginCommand <> String.Join(' ', command) then
+          begin
+            FPluginStorageService.DisposeOf;
+            FPluginStorageService := nil;
+          end;
 
-        FPluginStorageService := TPluginStorageService.Create(TTMSFNCWebBrowser(FCommandControl));
+        // Create new storage service for this command if needed
+        if not Assigned(FPluginStorageService) then
+          FPluginStorageService := TPluginStorageService.Create(TTMSFNCWebBrowser(FCommandControl), String.Join(' ', command));
 
         // Load it!
         TTMSFNCWebBrowser(FCommandControl).Navigate(FileURL);

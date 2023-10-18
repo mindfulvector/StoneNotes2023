@@ -15,9 +15,10 @@ class PluginStorageService {
     this.jobCallbacks[jobId] = params.pop();
     // Note: method params are passed as a base64 encoded JSON array 
     const url = `file://storage-service/${jobId}/${methodName}/${base64ToBase64Url(btoa(JSON.stringify(params)))}`;
-    console.log('PluginStorageService:'+url);
+    console.log('PluginStorageService.callMethod:'+url);
     
     window.location.href = url;
+    console.log('window.location.href='+window.location.href);
   }
 
   // This is called from Delphi to return result of a method call.

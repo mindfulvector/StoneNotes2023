@@ -4,15 +4,16 @@ interface
 
 uses
   System.Types, System.SysUtils, System.ZLib, System.NetEncoding,
-  System.RegularExpressions, System.Classes;
+  System.RegularExpressions, System.Classes, System.StrUtils;
 
 function SplitString(const AInput: string): TStringDynArray;
 function JoinString(const Arr: TStringDynArray): string;
 function EscapeString(const s: string): string;
 function StandardizeLineEndings(const S: string): string;
+function AddSlashes(AString: string): string;
 
 function CompressString(const AString: string): string;
-function DecompressString(const AString: string): string;
+function DecompressString(AString: string): string;
 
 implementation
 
@@ -126,6 +127,13 @@ begin
   end;
 end;
 
+function AddSlashes(AString: string): string;
+begin
+  Result := AString;
+  Result := ReplaceStr(Result, '"', '\"');
+  Result := ReplaceStr(Result, '''', '\''');
+end;
+
 function StandardizeLineEndings(const S: string): string;
 begin
   Result := S;
@@ -143,6 +151,9 @@ var
   Input, Output: TBytesStream;
   Compressor: TZCompressionStream;
 begin
+  Result := '';
+  if '' = AString then Exit;
+
   Input := TBytesStream.Create(TEncoding.UTF8.GetBytes(AString));
   try
     Output := TBytesStream.Create;
@@ -153,7 +164,7 @@ begin
       finally
         Compressor.Free;
       end;
-      Result := TNetEncoding.Base64.EncodeBytesToString(Output.Bytes);
+      Result := '!' + TNetEncoding.Base64URL.EncodeBytesToString(Output.Bytes);
     finally
       Output.Free;
     end;
@@ -162,13 +173,21 @@ begin
   end;
 end;
 
-function DecompressString(const AString: string): string;
+function DecompressString(AString: string): string;
 var
   Input, Output: TBytesStream;
   Decompressor: TZDecompressionStream;
   DecodedBytes: TBytes;
 begin
-  DecodedBytes := TNetEncoding.Base64.DecodeStringToBytes(AString);
+  Result := '';
+  if '' = AString then Exit;
+
+  Result := AString;
+  if '!' <> AString[1] then Exit;
+
+  AString := AString.Substring(2);
+  DecodedBytes := TNetEncoding.Base64URL.DecodeStringToBytes(AString);
+
   Input := TBytesStream.Create(DecodedBytes);
   try
     Output := TBytesStream.Create;
@@ -188,5 +207,6 @@ begin
   end;
   Input.Free;
 end;
+
 
 end.

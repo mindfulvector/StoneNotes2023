@@ -115,7 +115,7 @@ begin
           style := FGlobalLayoutValues.Values['Style'];
           if '' <> style then
           begin
-            style := DecompressString(style);
+            //style := DecompressString(style);
             TmpStyleFile := 'C:\ProgramData\StoneNotes\Style_'+ExtractFileName(FFilename)+'.style';
             TFile.WriteAllText(TmpStyleFile, style);
             TStyleManager.SetStyleFromFile(TmpStyleFile);
@@ -176,7 +176,8 @@ procedure TfrmStoneNotes.btnStyleClick(Sender: TObject);
 var
   StyleText: string;
 begin
-  FGlobalLayoutValues.Values['Style'] := CompressString(ModifyAndApplyStyleToForm(Self));
+//  FGlobalLayoutValues.Values['Style'] := CompressString(ModifyAndApplyStyleToForm(Self));
+  FGlobalLayoutValues.Values['Style'] := ModifyAndApplyStyleToForm(Self);
 end;
 
 procedure TfrmStoneNotes.FormCreate(Sender: TObject);

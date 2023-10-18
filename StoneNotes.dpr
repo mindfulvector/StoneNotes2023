@@ -12,7 +12,8 @@ uses
   StringUtils in 'StringUtils.pas',
   PluginStorageService in 'PluginStorageService.pas',
   StyleMaker in 'StyleMaker.pas',
-  InputQueryDropdown in 'InputQueryDropdown.pas';
+  InputQueryDropdown in 'InputQueryDropdown.pas',
+  PluginEditor in 'PluginEditor.pas';
 
 {$R *.res}
 

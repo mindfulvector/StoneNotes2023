@@ -138,6 +138,7 @@
         <DCCReference Include="PluginStorageService.pas"/>
         <DCCReference Include="StyleMaker.pas"/>
         <DCCReference Include="InputQueryDropdown.pas"/>
+        <DCCReference Include="PluginEditor.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

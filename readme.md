@@ -14,6 +14,7 @@ M - open a memo field
 B - open a browser
 STIC - Sticky Notes demo plugin (data now saved to the layout file, if you save a layout)
 GEN - AI-generated wallpaper prompt generator
+EPLG - Edit plugins (work in progress, not yet functional)
 ```
 
 <img src="screenshot2.png"/>

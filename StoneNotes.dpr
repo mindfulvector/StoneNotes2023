@@ -13,7 +13,9 @@ uses
   PluginStorageService in 'PluginStorageService.pas',
   StyleMaker in 'StyleMaker.pas',
   InputQueryDropdown in 'InputQueryDropdown.pas',
-  PluginEditor in 'PluginEditor.pas';
+  PluginEditor in 'PluginEditor.pas',
+  ServerThread in 'ServerThread.pas',
+  WebSocketServer in 'WebSocketServer.pas';
 
 {$R *.res}
 

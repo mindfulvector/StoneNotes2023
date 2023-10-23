@@ -5,7 +5,7 @@ interface
 uses
   {system}
   Windows, System.SysUtils, System.Types, System.UITypes, System.Classes,
-  System.IOUtils, System.StrUtils, ShellApi, System.Contnrs,
+  System.IOUtils, System.StrUtils, ShellApi, System.Contnrs, System.JSON,
 
   {framework}
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
@@ -17,7 +17,8 @@ uses
   FMX.SplitterPanel, FMX.BufferPanel,
 
   {other custom classes}
-  SplitterSerializer, PluginManager, Logger, StyleMaker, StringUtils;
+  SplitterSerializer, PluginManager, Logger, StyleMaker, StringUtils,
+  ServerThread;
 
 type
   TfrmStoneNotes = class(TForm)
@@ -42,6 +43,7 @@ type
     procedure btnNewClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FFilename: string;
     FGlobalLayoutValues: TStringList;
@@ -49,9 +51,13 @@ type
     FLastSplitterRight: TSplitterPanel;
     FLastSplitterLeft: TSplitterPanel;
     FPluginManager: TPluginManager;
+    FServerThread: TServerThread;
     procedure UpdateWindowCaption;
+    procedure StartServer;
+    procedure StopServer;
   public
     { Public declarations }
+    procedure ProcessJSONMessage(const AJSON: string);
   published
     property LastSplitterRight: TSplitterPanel read FLastSplitterRight write FLastSplitterRight;
     property LastSplitterLeft: TSplitterPanel read FLastSplitterLeft write FLastSplitterLeft;
@@ -63,6 +69,7 @@ var
 implementation
 
 {$R *.fmx}
+
 
 procedure TfrmStoneNotes.btnNewClick(Sender: TObject);
 var
@@ -185,6 +192,13 @@ begin
 end;
 
 
+procedure TfrmStoneNotes.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Logger.Log('Main form closing');
+  StopServer;
+  FlushLogBuffer;
+end;
+
 procedure TfrmStoneNotes.FormCreate(Sender: TObject);
 var
   PluginCount: integer;
@@ -206,6 +220,8 @@ begin
   FLastSplitterRight := FSplitterPanel;
   FLastSplitterLeft := FSplitterPanel;
   Resize;
+
+  StartServer;
 end;
 
 procedure TfrmStoneNotes.FormDeactivate(Sender: TObject);
@@ -232,6 +248,36 @@ begin
   FSplitterPanel.SetBounds(5, btnSplitRight.Height + 10, Self.Width - 25, Self.Height - 90);
 end;
 
+procedure TfrmStoneNotes.StartServer;
+begin
+  FServerThread := TServerThread.Create;
+  FServerThread.StartServer;
+end;
+
+procedure TfrmStoneNotes.StopServer;
+begin
+  FServerThread.StopServer;
+  FServerThread := nil;
+end;
+
+
+
+procedure TfrmStoneNotes.ProcessJSONMessage(const AJSON: string);
+var
+  JSONObject: TJSONObject;
+begin
+  try
+    JSONObject := TJSONObject.ParseJSONValue(AJSON) as TJSONObject;
+    if Assigned(JSONObject) then
+    begin
+      // Handle the JSON object as needed.
+      // For example, assuming the JSON contains a 'message' string value:
+      ShowMessage('Message from server process via TServerThread: '+JSONObject.GetValue<string>('message'));
+    end;
+  finally
+    JSONObject.Free;
+  end;
+end;
 
 end.
 

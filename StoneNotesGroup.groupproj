@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{035A29B9-0B63-4926-BE6D-CE7933DA01BA}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Updater\StoneUpdate.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="StoneNotes.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="StoneUpdate">
+        <MSBuild Projects="Updater\StoneUpdate.dproj"/>
+    </Target>
+    <Target Name="StoneUpdate:Clean">
+        <MSBuild Projects="Updater\StoneUpdate.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="StoneUpdate:Make">
+        <MSBuild Projects="Updater\StoneUpdate.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="StoneNotes">
+        <MSBuild Projects="StoneNotes.dproj"/>
+    </Target>
+    <Target Name="StoneNotes:Clean">
+        <MSBuild Projects="StoneNotes.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="StoneNotes:Make">
+        <MSBuild Projects="StoneNotes.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="StoneUpdate;StoneNotes"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="StoneUpdate:Clean;StoneNotes:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="StoneUpdate:Make;StoneNotes:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

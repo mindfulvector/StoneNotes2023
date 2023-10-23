@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Text Overlay</title>
+    <style>
+        #image-container {
+            position: relative;
+            width: 515px;
+            height: 880px;
+            overflow: hidden;
+        }
+
+        #image-display {
+            width: 515px;
+            height: 880px;
+        }
+
+        .overlay-div {
+            position: absolute;
+            border: 1px solid white;
+            background-color: transparent;
+            min-width: 20px;
+            min-height: 20px;
+        }
+
+        .overlay-div-centered {
+            padding-top: 15px;
+            padding-bottom: -15px;
+        }
+
+        #modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+
+        #json-textarea {
+            width: 100%;
+            height: 200px;
+        }
+
+        canvas {
+            position: absolute;
+            right: 0;
+            top: 0;
+            display: none;
+        }
+    </style>
+    <script src="../../Assets/PluginStorageService.js"></script>
+</head>
+<body>
+    <select id="template-selector">
+        <option value="daily_left_blue.png">Blue</option>
+        <option value="template2.png">Template 2</option>
+        <!-- Add more templates as required -->
+    </select>
+
+    <button id="save-btn">Save</button>
+    <button id="load-btn">Load</button>
+
+
+    <div id="image-container">
+        <img id="image-display" src="">
+    </div>
+
+    <div id="modal">
+        <textarea id="json-textarea"></textarea>
+        <button id="ok-btn">OK</button>
+        <button id="cancel-btn">Cancel</button>
+    </div>
+
+    <script>
+        // Note: Actual image processing and pixel manipulation requires libraries like `pixi.js` or `paper.js` or `fabric.js`.
+        // This implementation is a basic mockup and does not actually perform pixel manipulation.
+        
+        const templateSelector = document.getElementById('template-selector');
+        const imageDisplay = document.getElementById('image-display');
+        const saveBtn = document.getElementById('save-btn');
+        const loadBtn = document.getElementById('load-btn');
+        const modal = document.getElementById('modal');
+        const jsonTextarea = document.getElementById('json-textarea');
+        const okBtn = document.getElementById('ok-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+
+        imageDisplay.src = templateSelector.options[0].value;
+        templateSelector.addEventListener('change', function() {
+            imageDisplay.src = this.value;
+        });
+
+        function getColorAtPixel(imageData, x, y) {
+            const index = (y * imageData.width + x) * 4;
+            return [
+                imageData.data[index],
+                imageData.data[index + 1],
+                imageData.data[index + 2],
+                imageData.data[index + 3]
+            ];
+        }
+
+        function setColorAt(imageData, x, y, color) {
+            const index = (y * imageData.width + x) * 4;
+            imageData.data[index] = color[0];
+            imageData.data[index + 1] = color[1];
+            imageData.data[index + 2] = color[2];
+            imageData.data[index + 3] = color[3];
+        }
+
+        function colorsMatch(a, b, tolerance) {
+            const diff = Math.sqrt(
+                Math.pow(a[0] - b[0], 2) +
+                Math.pow(a[1] - b[1], 2) +
+                Math.pow(a[2] - b[2], 2)
+            );
+            return diff <= (255 * tolerance);
+        }
+
+        imageDisplay.addEventListener('click', function(e) {
+            e.preventDefault();
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Find bounding box from click
+            const canvas = document.getElementById('work-canvas');
+            const ctx = canvas.getContext('2d');
+            const templateImage = document.getElementById('image-display');
+            ctx.drawImage(templateImage, 0, 0, canvas.width, canvas.height);
+            console.log('dimensions', [canvas.width, canvas.height])
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const result = findBoundsFromPoint(imageData, ctx, x, y, getColorAtPixel(imageData, x, y), 0.1);
+
+            console.log('findBoundsFromPoint result:',result);
+            const boundingBox = {
+                top: result.topLeft.y,
+                left: result.topLeft.x,
+                width: result.bottomRight.x - result.topLeft.x,
+                height: result.bottomRight.y - result.topLeft.y,
+            };
+
+            console.log('boundingBox result:',boundingBox);
+
+            const overlayDiv = document.createElement('div');
+            overlayDiv.classList.add('overlay-div');
+            if(boundingBox.height >= 24 && boundingBox.height < 54) {
+                boundingBox.top += 5;
+                boundingBox.height -= 15;
+            }
+            overlayDiv.contentEditable = true;
+            overlayDiv.style.top = `${boundingBox.top}px`;
+            overlayDiv.style.left = `${boundingBox.left}px`;
+            overlayDiv.style.width = `${boundingBox.width}px`;
+            overlayDiv.style.height = `${boundingBox.height}px`;
+            
+            overlayDiv.addEventListener('blur', function() {
+                if (!this.textContent.trim()) {
+                    this.remove();
+                }
+                overlayDiv.style.border = 'none';
+            });
+            
+            overlayDiv.addEventListener('click', function() {
+                if (!this.textContent.trim()) {
+                    this.remove();
+                }
+            });
+
+            document.getElementById('image-container').appendChild(overlayDiv);
+            overlayDiv.focus();
+        });
+
+        var dialogMode = 'save';
+
+        saveBtn.addEventListener('click', function() {
+            const overlays = document.querySelectorAll('.overlay-div');
+            const data = Array.from(overlays).map(overlay => {
+                return {
+                    top: overlay.style.top,
+                    left: overlay.style.left,
+                    width: overlay.style.width,
+                    height: overlay.style.height,
+                    text: overlay.textContent,
+                };
+            });
+            const jsonData = JSON.stringify(data, null, 2);
+            if(typeof PluginStorageService === 'function') {
+                PluginStorageService.writeLayoutValue('DayData_'+templateSelector.value, jsonData);
+            } else {
+                dialogMode = 'save';
+                jsonTextarea.value = jsonData
+                modal.style.display = 'block';
+            }
+        });
+
+        function loadJsonData(jsonData) {
+            const data = JSON.parse(jsonData);
+                data.forEach(item => {
+                    const overlayDiv = document.createElement('div');
+                    overlayDiv.classList.add('overlay-div');
+                    overlayDiv.contentEditable = true;
+                    overlayDiv.style.top = item.top;
+                    overlayDiv.style.left = item.left;
+                    overlayDiv.style.width = item.width;
+                    overlayDiv.style.height = item.height;
+                    overlayDiv.textContent = item.text;
+                    overlayDiv.style.border = 'none';
+
+                    overlayDiv.addEventListener('blur', function() {
+                        if (!this.textContent.trim()) {
+                            this.remove();
+                        }
+                    });
+
+                    document.getElementById('image-container').appendChild(overlayDiv);
+                });
+        }
+
+        function loadOverlayData() {
+            if(typeof PluginStorageService === 'function') {
+                const jsonData = PluginStorageService.readLayoutValue('DayData_'+templateSelector.value);
+                loadJsonData(jsonData);
+            } else {
+                dialogMode = 'load';
+                modal.style.display = 'block';
+            }
+        }
+        if(typeof PluginStorageService === 'function') {
+            loadOverlayData()
+        }
+
+        loadBtn.addEventListener('click', function() {
+            loadOverlayData();
+        });
+
+        okBtn.addEventListener('click', function() {
+            if(dialogMode == 'load') {
+                const jsonData = jsonTextarea.value;
+                loadJsonData(jsonData);
+            }
+
+            modal.style.display = 'none';
+        });
+
+        cancelBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        function findBoundsFromPoint(imageData, ctx, startX, startY, targetColor, tolerance=0.3) {
+            const width = imageData.width;
+            const height = imageData.height;
+            const stack = [[startX, startY]];
+            const visited = new Set();
+            let minX = startX, maxX = startX, minY = startY, maxY = startY;
+
+            while (stack.length) {
+                const [x, y] = stack.pop();
+                if (x < 0 || x >= width || y < 0 || y >= height) continue;
+
+                const key = `${x},${y}`;
+                if (visited.has(key)) continue;
+
+                const color = getColorAtPixel(imageData, x, y);
+
+                if (colorsMatch(color, targetColor, tolerance)) {
+                    setColorAt(imageData, x, y, [255, 255, 0, 0]);
+                    minX = Math.min(minX, x);
+                    maxX = Math.max(maxX, x);
+                    minY = Math.min(minY, y);
+                    maxY = Math.max(maxY, y);
+
+                    console.log([[minX, minY], [maxX-minX, maxY-minY]]);
+                    
+                    stack.push([x + 1, y]);
+                    stack.push([x - 1, y]);
+                    stack.push([x, y + 1]);
+                    stack.push([x, y - 1]);
+                } else {
+                    //setColorAt(imageData, x, y, [255, 255, 0, 0]); // Example: set to red for visualization
+                }
+
+                visited.add(key);
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+
+            return {
+                topLeft: { x: minX, y: minY },
+                bottomRight: { x: maxX, y: maxY }
+            };
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' || event.keyCode === 27) { // Check for the ESC key
+                if (document.activeElement) { // Check if there is an active element
+                    document.activeElement.blur(); // Remove focus from the active element
+                }
+            }
+        });
+
+    </script>
+
+    <canvas id="work-canvas" width="515" height="880"></canvas>
+    
+</body>
+</html>

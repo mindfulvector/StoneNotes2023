@@ -298,7 +298,10 @@ begin
     TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com')
   else
   begin
-    if command[1].StartsWith('http://') or command[1].StartsWith('https://') then
+    if command[1].StartsWith('http://')
+        or command[1].StartsWith('https://')
+        or command[1].StartsWith('file://')
+        or command[1].StartsWith('data://')  then
       TTMSFNCWebBrowser(FCommandControl).Navigate(command[1])
     else
       TTMSFNCWebBrowser(FCommandControl).Navigate('https://' + command[1]);

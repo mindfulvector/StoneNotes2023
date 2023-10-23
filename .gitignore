@@ -1,3 +1,4 @@
+_Art
 *.dcu
 Win32
 Win64
@@ -7,5 +8,6 @@ tests\Win64
 *.log
 Support/*.zip
 Support/Hiawatha/*
+Support/CEF/*
 __recovery
 Plugins/ThinVNC/*

@@ -19,19 +19,19 @@ print "Create config...\n";
 file_put_contents(".\Hiawatha\config\hiawatha.conf", <<<END
 # Hiawatha main configuration file
 #
-set INSTALL_DIR = CONFIG_DIR\..
+set INSTALL_DIR = CONFIG_DIR\\..
 
 
 # GENERAL SETTINGS
 #
 ConnectionsTotal = 150
 ConnectionsPerIP = 10
-SystemLogfile = C:\ProgramData\StoneNotes\Hiawatha\system.log
-GarbageLogfile = C:\ProgramData\StoneNotes\Hiawatha\garbage.log
-ExploitLogfile = C:\ProgramData\StoneNotes\Hiawatha\exploit.log
-PIDfile = C:\ProgramData\StoneNotes\Hiawatha\hiawatha.pid
-WorkDirectory = C:\ProgramData\StoneNotes\Hiawatha\work
-
+SystemLogfile = C:\\ProgramData\\StoneNotes\\Hiawatha\\system.log
+GarbageLogfile = C:\\ProgramData\\StoneNotes\\Hiawatha\\garbage.log
+ExploitLogfile = C:\\ProgramData\\StoneNotes\\Hiawatha\\exploit.log
+PIDfile = C:\\ProgramData\\StoneNotes\\Hiawatha\\hiawatha.pid
+WorkDirectory = C:\\ProgramData\\StoneNotes\\Hiawatha\\work
+FollowSymlinks = yes
 
 # BINDING SETTINGS
 # A binding is where a client can connect to.
@@ -48,7 +48,7 @@ Binding {
 #	Interface = ::1
 #	MaxKeepAlive = 30
 #	TimeForRequest = 3,20
-#	TLScertFile = INSTALL_DIR\config\hiawatha.pem
+#	TLScertFile = INSTALL_DIR\\config\\hiawatha.pem
 #}
 
 
@@ -65,8 +65,8 @@ Binding {
 # COMMON GATEWAY INTERFACE (CGI) SETTINGS
 # These settings can be used to run CGI applications.
 #
-#CGIhandler = C:\Program Files\PHP8\php-cgi.exe:php
-#CGIhandler = INSTALL_DIR\program\ssi-cgi.exe:shtml
+#CGIhandler = C:\\Program Files\\PHP8\\php-cgi.exe:php
+#CGIhandler = INSTALL_DIR\\program\\ssi-cgi.exe:shtml
 #CGIextension = exe
 #
 #FastCGIserver {
@@ -85,7 +85,7 @@ Binding {
 #	RequestURI isfile Return
 #	Match ^/(css|files|images|js)/ Return
 #	Match ^/(favicon.ico|robots.txt|sitemap.xml)$ Return
-#	Match .*\?(.*) Rewrite /index.php?$1
+#	Match .*\\?(.*) Rewrite /index.php?$1
 #	Match .* Rewrite /index.php
 #}
 
@@ -96,10 +96,10 @@ Binding {
 # your possible vulnerable website.
 #
 Hostname = 127.0.0.1
-WebsiteRoot = INSTALL_DIR\default_site
+WebsiteRoot = INSTALL_DIR\\default_site
 StartFile = index.html
-AccessLogfile = INSTALL_DIR\logfiles\access.log
-ErrorLogfile = INSTALL_DIR\logfiles\error.log
+AccessLogfile = INSTALL_DIR\\logfiles\\access.log
+ErrorLogfile = INSTALL_DIR\\logfiles\\error.log
 END);
 
 print "Initial component startup...\n";
@@ -121,7 +121,7 @@ GOTO END
 :MAIN
 IF /i "%1" == "i" GOTO INSTALL
 IF /i "%1" == "u" GOTO UNINSTALL
-ECHO Invalid option.
+ECHO Invalid option, please specify either i or u when calling service-hiawatha.bat
 PAUSE
 GOTO END
 
@@ -129,6 +129,11 @@ GOTO END
 ECHO Installing Hiawatha as a Windows service...
 "%INSTALL_DIR%program\cygrunsrv.exe" -I hiawathaStoneNotes  -d "Hiawatha webserver for StoneNotes" -f "Secure and advanced webserver, optional component for StoneNotes" -p "%INSTALL_DIR%program\hiawatha.exe" -a "-d -c '%INSTALL_DIR%config'"
 net start hiawathaStoneNotes
+
+ECHO Creating resource links...
+MKLINK /J %INSTALL_DIR%\\default_site\\Assets %INSTALL_DIR%\\..\\..\\Assets
+MKLINK /J %INSTALL_DIR%\\default_site\\Plugins %INSTALL_DIR%\\..\\..\\Plugins
+
 GOTO END
 
 :UNINSTALL
@@ -157,7 +162,7 @@ cleanup();
 
 function cleanup() {
 	print "Cleaning up...\n";
-	file_exists("service-hiawatha.bat") && unlink("service-hiawatha.bat");
-	file_exists("service-hiawatha.vbs") && unlink("service-hiawatha.vbs");
-	file_exists("Hiawatha.zip") && unlink("Hiawatha.zip");
+	//file_exists("service-hiawatha.bat") && unlink("service-hiawatha.bat");
+	//file_exists("service-hiawatha.vbs") && unlink("service-hiawatha.vbs");
+	//file_exists("Hiawatha.zip") && unlink("Hiawatha.zip");
 }

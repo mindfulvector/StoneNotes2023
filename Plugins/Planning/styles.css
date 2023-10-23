@@ -1,0 +1,185 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 0;
+    background-color: #f7f7f7;
+}
+
+.planner {
+    max-width: 600px; /* A5 width approximation */
+    margin: 0 auto;
+    padding: 0;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1, h2 {
+    margin: 0;
+}
+
+h2 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.daily-priorities, .notes {
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+.tasks ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.tasks li {
+    margin-bottom: 8px;
+}
+
+
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: 5px;
+    background: #e0e0e0;
+    box-shadow: inset 2px 2px 5px #babecc, inset -5px -5px 10px #ffffff;
+}
+
+.tab {
+    flex-grow: 1;
+    padding: 10px 15px;
+    text-align: center;
+    background: #e0e0e0;
+    text-decoration: none;
+    color: black;
+    transition: background 0.3s;
+    border-radius: 5px 5px 0 0;
+    position: relative;
+    z-index: 1;
+}
+
+.tab.active {
+    background: #ffffff;
+    box-shadow: 2px 2px 5px #babecc, -2px -2px 5px #ffffff;
+    z-index: 2;
+}
+
+.tab:not(.active):hover {
+    background: #d5d5d5;
+}
+
+.tab-content {
+    /* Styling for the content of each tab. You can modify as required. */
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-top: none; /* Since the tabs have the top border */
+}
+
+
+.planner {
+    background-color: #E6ECEC;
+}
+
+.date-column, .appointments-column {
+    display: inline-block;
+    vertical-align: top;
+    width: 49%; /* Adjusted for a tiny space between columns */
+    border: 1px solid #086864;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.current-date {
+    text-align: left;
+}
+
+.day-number {
+    font-size: 48px;
+    margin: 0;
+}
+
+.day-name, .month-year {
+    font-size: 24px;
+    margin: 5px 0;
+}
+
+.month-view {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.day-header {
+    font-weight: bold;
+}
+
+.days {
+    font-size: 14px;
+}
+
+.today {
+    background-color: #086864;
+    color: #ffffff;
+    padding: 2px 4px;
+    border-radius: 50%;
+}
+
+.task-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 20px;
+}
+
+.task-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.priority {
+    width: 20px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.task {
+    flex-grow: 1;
+    border: 1px solid #086864;
+    padding: 5px;
+}
+
+.appointments-column textarea {
+    width: 100%;
+    border: 1px solid #086864;
+    box-sizing: border-box;
+    resize: vertical;
+    margin-bottom: 10px;
+}
+
+.time-slots .time {
+    margin-bottom: 5px;
+}

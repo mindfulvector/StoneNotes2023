@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Franklin Covey Daily Planning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <a href="day.html">Day</a>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    let tabs = document.querySelectorAll(".tab");
+    let contents = document.querySelectorAll(".tab-content");
+
+    tabs.forEach(function(tab) {
+        tab.addEventListener("click", function(e) {
+            e.preventDefault();
+
+            // Remove active class from all tabs
+            tabs.forEach(function(innerTab) {
+                innerTab.classList.remove("active");
+            });
+
+            // Hide all content divs
+            contents.forEach(function(content) {
+                content.style.display = "none";
+            });
+
+            // Add active class to clicked tab and display its content
+            tab.classList.add("active");
+            let contentId = "content-" + tab.id.split("-")[1];
+            document.getElementById(contentId).style.display = "block";
+        });
+    });
+});
+</script>
+<div class="planner">
+    
+    <div class="tabs">
+        <a href="#" class="tab active" id="tab-dailyplan">Daily Plan</a>
+        <a href="#" class="tab" id="tab-priorities">Priorities</a>
+        <a href="#" class="tab" id="tab-three">Tab 3</a>
+        <a href="#" class="tab" id="tab-four">Tab 4</a>
+        <a href="#" class="tab" id="tab-five">Tab 5</a>
+        <a href="#" class="tab" id="tab-six">Tab 6</a>
+        <a href="#" class="tab" id="tab-seven">Tab 7</a>
+    </div>
+
+
+        <div class="tab-content" id="content-dailyplan">
+
+            <div class="date-column">
+                <div class="current-date">
+                    <div class="day-number">23</div>
+                    <div class="day-name">Thursday</div>
+                    <div class="month-year">October 2023</div>
+                </div>
+                <div class="month-view">
+                    <div class="day-header">S M T W T F S</div>
+                    <!-- Dates for the month view can be added programmatically or manually -->
+                    <div class="days">1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 <span class="today">23</span> 24 25 26 27 28 29 30 31</div>
+                </div>
+                <h3>Prioritized Daily Task List</h3>
+                <ul class="task-list">
+                    <li>
+                        <input type="checkbox">
+                        <div class="priority">A</div>
+                        <div class="task">Task 1</div>
+                    </li>
+                    <!-- Additional tasks can be added as needed -->
+                </ul>
+            </div>
+
+            <div class="appointments-column">
+                <h3>Appointment Schedule</h3>
+                <ul class="time-slots">
+                    <li>
+                        <div class="time">8:00AM</div>
+                        <textarea></textarea>
+                    </li>
+                    <!-- Additional time slots can be added as needed up to 9:00PM -->
+                </ul>
+            </div>
+
+        </div><!-- daily-plan -->
+    </div>
+
+    <div class="tab-content" id="content-priorities" style="display: none;">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 40px;
+            }
+            #content-priorities #planner {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+            #content-priorities .priority {
+                margin-bottom: 20px;
+            }
+        </style>
+        <h2>Daily Priorities Planner</h2>
+        <div id="planner">
+            <div class="priority" id="priority1">
+                <label for="priority1Input">Priority 1:</label>
+                <input type="text" id="priority1Input" placeholder="Enter your first priority">
+            </div>
+            <div class="priority" id="priority2">
+                <label for="priority2Input">Priority 2:</label>
+                <input type="text" id="priority2Input" placeholder="Enter your second priority">
+            </div>
+            <div class="priority" id="priority3">
+                <label for="priority3Input">Priority 3:</label>
+                <input type="text" id="priority3Input" placeholder="Enter your third priority">
+            </div>
+            <button onclick="savePriorities()">Save Priorities</button>
+            <p id="message"></p>
+        </div>
+
+        <script>
+            function savePriorities() {
+                const priority1Value = document.getElementById('priority1Input').value;
+                const priority2Value = document.getElementById('priority2Input').value;
+                const priority3Value = document.getElementById('priority3Input').value;
+
+                if (priority1Value && priority2Value && priority3Value) {
+                    // Saving the priorities to local storage
+                    localStorage.setItem('priority1', priority1Value);
+                    localStorage.setItem('priority2', priority2Value);
+                    localStorage.setItem('priority3', priority3Value);
+
+                    document.getElementById('message').textContent = 'Priorities saved!';
+                } else {
+                    document.getElementById('message').textContent = 'Please fill all priorities.';
+                }
+            }
+
+            // When the page loads, retrieve priorities from local storage
+            window.onload = function() {
+                const priority1Value = localStorage.getItem('priority1');
+                const priority2Value = localStorage.getItem('priority2');
+                const priority3Value = localStorage.getItem('priority3');
+
+                if (priority1Value) document.getElementById('priority1Input').value = priority1Value;
+                if (priority2Value) document.getElementById('priority2Input').value = priority2Value;
+                if (priority3Value) document.getElementById('priority3Input').value = priority3Value;
+            }
+        </script>
+    </div>
+</div>
+
+
+
+
+</body>
+</html>

@@ -16,7 +16,8 @@ uses
   Vcl.ImgList,     // For TImageList
   Vcl.Dialogs,     // For ShowMessage and MessageDlg
   IdComponent,     // For TIdProgressEvent and other Indy component basics
-  IdHTTP;          // For handling HTTP-based downloads
+  IdHTTP,          // For handling HTTP-based downloads
+  IdSSL;           // For handling HTTPS via TIdSSLIOHandlerSocketOpenSSL
 
 type
 
@@ -342,6 +343,7 @@ var
   ZipFile: TZipFile;
   Form: TForm;
   StatusLabel: TLabel;
+  SSLHandler: TIdSSLIOHandlerSocketOpenSSL;
 begin
   Result := false;
 
@@ -374,6 +376,9 @@ begin
   MemStream := TMemoryStream.Create;
 
   try
+      SSLHandler := TIdSSLIOHandlerSocketOpenSSL.Create(HTTP);
+    SSLHandler.SSLOptions.SSLVersions := [sslvTLSv1_2];
+    HTTP.IOHandler := SSLHandler;
     DownloadHTTP.OnWork := TWorkEventWrapper.Create(HTTPWork).Handler;
     DownloadHTTP.Get(AURL, MemStream);
     MemStream.Position := 0;

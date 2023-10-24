@@ -91,8 +91,12 @@ begin
       UpdateResult := false;
       while not UpdateResult do
       begin
-        // Download and unzip main package
-        UpdateResult := DownloadAndUnzip(UpdateInfo.MainURL, UpdateTargetDirectory);
+        // Download and unzip main package, if there is one for this update
+        // and if we are not already running that version
+        if '' = UpdateInfo.MainURL then
+          UpdateResult := true
+        else
+          UpdateResult := DownloadAndUnzip(UpdateInfo.MainURL, UpdateTargetDirectory);
 
         // Download and unzip selected support packages
         if UpdateResult then

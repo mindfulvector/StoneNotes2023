@@ -1,29 +1,29 @@
 [Version]
 Major=1
-Minor=2
-Patch=3
+Minor=0
+Patch=0
 Build=4567
 
 [MainPackage]
-URL=https://example.com/updates/main_package_1_2_3_4567.zip
+URL=
 
 [SupportPackages]
 Count=3
 
 [SupportPackage1]
-Name=Graphics Update
+Name=Hiawatha
 Category=Required
-URL=https://example.com/updates/graphics_update_1_2_3_4567.zip
+URL=https://github.com/mindfulvector/StoneNotes2023_Support/raw/main/Hiawatha.zip
 
-[SupportPackage2]
-Name=Audio Library
-Category=Recommended
-URL=https://example.com/updates/audio_lib_1_2_3_4567.zip
-
-[SupportPackage3]
-Name=New Theme
-Category=Optional
-URL=https://example.com/updates/theme_1_2_3_4567.zip
+;[SupportPackage2]
+;Name=Audio Library
+;Category=Recommended
+;URL=https://example.com/updates/audio_lib_1_2_3_4567.zip
+;
+;[SupportPackage3]
+;Name=New Theme
+;Category=Optional
+;URL=https://example.com/updates/theme_1_2_3_4567.zip
 
 [Notes]
-Release notes for this version.
+Initial update

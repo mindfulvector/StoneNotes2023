@@ -17,8 +17,7 @@ GEN - AI-generated wallpaper prompt generator
 EPLG - Edit plugins (work in progress, not yet functional)
 ```
 
-<img src="docs/screenshot2.png"/>
 
-<img src="docs/screenshot.png"/>
-
-<img src="docs/screenshot3.png"/>
+<img src="https://raw.githubusercontent.com/mindfulvector/StoneNotes2023/main/Docs/screenshot3.png" />
+<img src="https://raw.githubusercontent.com/mindfulvector/StoneNotes2023/main/Docs/screenshot2.png" />
+<img src="https://raw.githubusercontent.com/mindfulvector/StoneNotes2023/main/Docs/screenshot.png" />

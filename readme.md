@@ -17,8 +17,8 @@ GEN - AI-generated wallpaper prompt generator
 EPLG - Edit plugins (work in progress, not yet functional)
 ```
 
-<img src="screenshot2.png"/>
+<img src="docs/screenshot2.png"/>
 
-<img src="screenshot.png"/>
+<img src="docs/screenshot.png"/>
 
-<img src="screenshot3.png"/>
+<img src="docs/screenshot3.png"/>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        #toolbar {
+            display: flex;
+            gap: 10px;
+        }
+
+        #editingArea {
+            border: 1px solid black;
+            margin-top: 20px;
+            position: relative;
+            height: 300px;
+        }
+
+        .card {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .label, .field, .button {
+            position: absolute;
+            border-radius: 4px;
+            background-color: white;
+            padding-right:2px;
+        }
+
+        .field textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+        }
+
+        .button div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .outlined {
+            outline: 1px solid black;
+            border-radius: 2px;
+        }
+
+        /* Modal styles */
+        #modal {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            border: 1px solid black;
+            background-color: white;
+            z-index: 999;
+        }
+
+        #modal label {
+            display: block;
+            margin: 10px;
+        }
+
+        #modal input {
+            width: 90%;
+            padding: 5px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <button onclick="switchMode('browse')"><i class="fas fa-mouse"></i> Browse</button>
+        <button onclick="switchMode('label')"><i class="fas fa-font"></i> Label</button>
+        <button onclick="switchMode('field')"><i class="fas fa-edit"></i> Field</button>
+        <button onclick="switchMode('button')"><i class="fas fa-button"></i> Button</button>
+        <button onclick="newCard()"><i class="fas fa-credit-card"></i> New Card</button>
+        <button onclick="prevCard()"><i class="fas fa-arrow-left"></i> Prev Card</button>
+        <button onclick="nextCard()"><i class="fas fa-arrow-right"></i> Next Card</button>
+    </div>
+
+    <div id="editingArea"></div>
+
+    <div id="modal">
+        <label>
+            Text: <input id="modalText" type="text">
+        </label>
+        <label>
+            Left: <input id="modalPositionLeft" type="text"> 
+            Top: <input id="modalPositionTop" type="text">
+        </label>
+        <label>
+            Width: <input id="modalSizeWidth" type="text">
+            Height: <input id="modalSizeHeight" type="text">
+        </label>
+        <label>
+            On the background: <input id="modalBackground" type="checkbox">
+        </label>
+        <label>
+            Script: <textarea id="modalScript" rows="4"></textarea>
+        </label>
+        <button onclick="saveChanges()">OK</button>
+        <button onclick="closeModal()">Cancel</button>
+        <button onclick="deleteItem()">Delete</button>
+    </div>
+
+    <script>
+        let mode = 'browse';
+        let cards = [];
+        let backgroundObjects = [];
+        let currentCardIndex = -1;
+        let selectedItem = null;
+
+        // This flag indicates if drag or resize operation is ongoing
+        let isInteractionOngoing = false; 
+
+        function switchMode(newMode) {
+            mode = newMode;
+
+            // Outline the selected mode
+            document.querySelectorAll('#toolbar button').forEach(btn => btn.classList.remove('outlined'));
+            document.querySelector(`#toolbar button[onclick="switchMode('${mode}')"]`).classList.add('outlined');
+
+            const editingArea = document.getElementById('editingArea');
+            editingArea.removeEventListener('mousedown', startCreation);
+            editingArea.removeEventListener('mousemove', duringCreation);
+            editingArea.removeEventListener('mouseup', endCreation);
+            document.querySelectorAll('.label').forEach(label => {
+                label.style.border = 'none';
+            });
+
+            if (mode !== 'browse') {
+                editingArea.addEventListener('mousedown', startCreation);
+                editingArea.addEventListener('mousemove', duringCreation);
+                editingArea.addEventListener('mouseup', endCreation);
+                document.querySelectorAll('.label').forEach(label => {
+                    label.style.border = '1px solid grey';
+                });
+            }
+
+            // During the browse mode, evaluate the custom onclick for each element
+            if (mode === 'browse') {
+                document.querySelectorAll('[data-custom-onclick]').forEach(item => {
+                    const customOnclick = item.getAttribute('data-custom-onclick');
+                    if (customOnclick) {
+                        item.onclick = new Function(customOnclick);
+                    }
+                });
+            } else {
+                document.querySelectorAll('[data-custom-onclick]').forEach(item => {
+                    const customOnclick = item.getAttribute('data-custom-onclick');
+                    if (customOnclick) {
+                        item.onclick = () => { };
+                    }
+                });
+            }
+        }
+
+        function showProperties(item) {
+            if (['label', 'field', 'button'].includes(mode)) {
+                selectedItem = item;
+                document.getElementById('modalText').value = selectedItem.innerText || selectedItem.querySelector('textarea').value.replaceAll("\n", "{n}");
+                document.getElementById('modalText').focus();
+                document.getElementById('modalPositionLeft').value = selectedItem.style.left;
+                document.getElementById('modalPositionTop').value = selectedItem.style.top;
+                document.getElementById('modalSizeWidth').value = selectedItem.style.width;
+                document.getElementById('modalSizeHeight').value = selectedItem.style.height;
+                const onclickScript = selectedItem.getAttribute('data-custom-onclick');
+                document.getElementById('modalScript').value = onclickScript ? onclickScript : '';
+
+                const objectId = selectedItem.getAttribute('data-objectId');
+                const existingObjIndex = backgroundObjects.findIndex(obj => obj.objectId === objectId);
+            
+                document.getElementById('modalBackground').checked = existingObjIndex !== -1;
+
+                document.getElementById('modal').style.display = 'block';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function saveChanges() {
+            if (selectedItem.classList.contains('label') || selectedItem.classList.contains('button')) {
+                selectedItem.innerText = document.getElementById('modalText').value;
+            } else if (selectedItem.classList.contains('field')) {
+                selectedItem.querySelector('textarea').value = document.getElementById('modalText').value.replaceAll("{n}", "\n");
+            }
+
+            // Save onclick script without directly assigning to onclick attribute
+            const scriptValue = document.getElementById('modalScript').value;
+            selectedItem.setAttribute('data-custom-onclick', scriptValue);
+
+            // If mode is 'browse', attach the custom onclick event
+            if (mode === 'browse') {
+                selectedItem.onclick = new Function(scriptValue);
+            }
+
+            selectedItem.style.left = document.getElementById('modalPositionLeft').value;
+            selectedItem.style.top = document.getElementById('modalPositionTop').value;
+            selectedItem.style.width = document.getElementById('modalSizeWidth').value;
+            selectedItem.style.height = document.getElementById('modalSizeHeight').value;
+            
+            const objectId = selectedItem.getAttribute('data-objectId');
+            const existingObjIndex = backgroundObjects.findIndex(obj => obj.objectId === objectId);
+            
+            if (document.getElementById('modalBackground').checked) {
+                selectedItem.classList.add('background-object');
+                var objType = '';
+                if(selectedItem.classList.contains('label')) objType = 'label';
+                if(selectedItem.classList.contains('button')) objType =  'button';
+                if(selectedItem.classList.contains('field')) objType =  'field';
+                
+                const serializedObj = {
+                    objectId: selectedItem.getAttribute('data-objectId'),
+                    type: objType,
+                    text: document.getElementById('modalText').value,
+                    script: document.getElementById('modalScript').value,
+                    left: selectedItem.style.left,
+                    top: selectedItem.style.top,
+                    width: selectedItem.style.width,
+                    height: selectedItem.style.height,
+                };
+
+                if (existingObjIndex === -1) {
+                    backgroundObjects.push(serializedObj);
+                } else {
+                    backgroundObjects[existingObjIndex] = serializedObj;
+                }
+            } else {
+                selectedItem.classList.remove('background-object');
+                // Remove from backgroundObjects if it exists
+                if (existingObjIndex !== -1) {
+                    backgroundObjects.splice(existingObjIndex, 1);
+                }
+            }
+
+            closeModal();
+        }
+
+        function deleteItem() {
+            var confirmed = false;
+            if (backgroundObjects.includes(selectedItem)) {
+                if (confirm('Are you sure you want to delete this item?\n\nWARNING: This object is on the background, deleting it may cause data loss on multiple cards!')) {
+                    // Remove from backgroundObjects list
+                    const objectId = selectedItem.getAttribute('data-objectId');
+                    const index = backgroundObjects.findIndex(obj => obj.objectId === objectId);
+                    
+                    if (index !== -1) {
+                        backgroundObjects.splice(index, 1);
+                    }
+
+                    confirmed = true;
+                }
+            } else {
+                if (confirm('Are you sure you want to delete this item?')) {
+                    confirmed = true;
+                }
+            }
+
+            if(confirmed) {
+                selectedItem.remove();
+            }
+            
+            closeModal();
+        
+        }
+
+        function addBackgroundObjectsToCard(card) {
+            const elements = document.querySelectorAll(".background-object").forEach(element => {
+                element.remove();
+            });
+
+            backgroundObjects.forEach(obj => {
+                let bkItem = createItem(obj.type, {x: obj.left, y: obj.top}, obj.width, obj.height);
+                bkItem.setAttribute('data-objectId', obj.objectId);
+                //bkItem.innerText = card.getAttribute('data-background-'+obj.objectId);
+                if (bkItem.classList.contains('label') || bkItem.classList.contains('button')) {
+                    bkItem.innerText = card.getAttribute('data-background-'+obj.objectId);
+                } else if (bkItem.classList.contains('field')) {
+                    bkItem.querySelector('textarea').value = (card.getAttribute('data-background-'+obj.objectId) || '').replaceAll("{n}", "\n");
+                }
+                bkItem.setAttribute('data-custom-onclick', obj.script);
+                bkItem.style.left = obj.left + 'px';
+                bkItem.style.top = obj.top + 'px';
+                bkItem.style.width = obj.width + 'px';
+                bkItem.style.height = obj.height + 'px';
+                bkItem.classList.add('background-object');
+            });
+        }
+
+
+        function generateUniqueId() {
+            return 'obj-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
+        }
+
+        function saveBackgroundObjectValues() {
+            const elements = document.querySelectorAll(".background-object").forEach(element => {
+                const objectId = element.getAttribute('data-objectId');
+                
+                cards[currentCardIndex].setAttribute('data-background-'+objectId, 
+                    (element.innerText 
+                        || element.querySelector('textarea').value).replaceAll("\n", "{n}"));
+
+                const existingObjIndex = backgroundObjects.findIndex(obj => obj.objectId === objectId);
+                
+                const serializedObj = {
+                    objectId: backgroundObjects[existingObjIndex].objectId,
+                    type: backgroundObjects[existingObjIndex].type,
+                    script: element.getAttribute('data-custom-onclick') || '',
+                    left: element.style.left,
+                    top: element.style.top,
+                    width: element.style.width,
+                    height: element.style.height,
+                };
+
+                backgroundObjects[existingObjIndex] = serializedObj;
+                
+            });
+        }
+        function newCard() {
+            saveBackgroundObjectValues();
+            const card = document.createElement('div');
+            card.className = 'card';
+            document.getElementById('editingArea').appendChild(card);
+            cards.push(card);
+
+            if (currentCardIndex !== -1) {
+                cards[currentCardIndex].classList.remove('active');
+            }
+
+            currentCardIndex++;
+            card.classList.add('active');
+
+            addBackgroundObjectsToCard(card);
+        }
+
+        function prevCard() {
+            saveBackgroundObjectValues();
+            if (currentCardIndex > 0) {
+                cards[currentCardIndex].classList.remove('active');
+                currentCardIndex--;
+                cards[currentCardIndex].classList.add('active');
+                addBackgroundObjectsToCard(cards[currentCardIndex]);
+            }
+        }
+
+        function nextCard() {
+            saveBackgroundObjectValues();
+            if (currentCardIndex < cards.length - 1) {
+                cards[currentCardIndex].classList.remove('active');
+                currentCardIndex++;
+                cards[currentCardIndex].classList.add('active');
+                addBackgroundObjectsToCard(cards[currentCardIndex]);
+            }
+        }
+
+
+        let startPosition = null;
+        let endPosition = null;
+
+        function startCreation(event) {
+            if (isInteractionOngoing) return;
+            startPosition = {
+                x: event.clientX,
+                y: event.clientY
+            };
+        }
+
+        function duringCreation(event) {
+            if (isInteractionOngoing) return;
+            if (startPosition) {
+                endPosition = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+            }
+        }
+
+        function endCreation(event) {
+            if (isInteractionOngoing) return;
+            if (startPosition && endPosition) {
+                const width = Math.abs(endPosition.x - startPosition.x);
+                const height = Math.abs(endPosition.y - startPosition.y);
+
+                if (width >= 10 && height >= 10) {
+                    createItem('', startPosition, width, height);
+                }
+
+                startPosition = null;
+                endPosition = null;
+            }
+        }
+
+        function createItem(type='', position, width, height) {
+            const card = cards[currentCardIndex];
+            const x = position.x - document.getElementById('editingArea').offsetLeft;
+            const y = position.y - document.getElementById('editingArea').offsetTop;
+            var result = null;
+            if(!type) type = mode;
+            if (type === 'label') {
+                const label = document.createElement('div');
+                result = label;
+                label.className = 'label';
+                label.innerText = 'Label';
+                label.setAttribute('data-objectId', generateUniqueId());
+                label.style.left = x + 'px';
+                label.style.top = y + 'px';
+                label.style.width = width + 'px';
+                label.style.height = height + 'px';
+                label.style.border = '1px solid grey';
+                card.appendChild(label);
+            } else if (type === 'field') {
+                const field = document.createElement('div');
+                result = field;
+                field.className = 'field';
+                field.innerHTML = '<textarea></textarea>';
+                field.setAttribute('data-objectId', generateUniqueId());
+                field.style.left = x + 'px';
+                field.style.top = y + 'px';
+                field.style.width = width + 'px';
+                field.style.height = height + 'px';
+                card.appendChild(field);
+            } else if (type === 'button') {
+                const button = document.createElement('button');
+                result = button;
+                button.className = 'button';
+                button.innerText = 'Button';
+                button.setAttribute('data-objectId', generateUniqueId());
+                button.style.left = x + 'px';
+                button.style.top = y + 'px';
+                button.style.width = width + 'px';
+                button.style.height = height + 'px';
+                button.style.position = 'absolute';
+                card.appendChild(button);
+            }
+
+            return result;
+        }
+
+
+        function alignToGrid(value) {
+            return Math.round(value / 5) * 5;
+        }
+
+        let draggingElement = null;
+        let resizingElement = null;
+        let dragStartPos = null;
+        let initialPos = null;
+        let initialSize = null;
+        let isDragging = false;
+        let isResizing = false;
+
+        document.getElementById('editingArea').addEventListener('mousedown', function(event) {
+            if (mode !== 'browse') {
+                const target = event.target.closest('.label, .field, .button');
+                if (target) {
+                    isInteractionOngoing = true;
+                    draggingElement = target;
+                    isDragging = true;
+                    dragStartPos = {
+                        x: event.clientX,
+                        y: event.clientY
+                    };
+                    initialPos = {
+                        x: parseInt(target.style.left, 10) || 0,
+                        y: parseInt(target.style.top, 10) || 0
+                    };
+                    initialSize = {
+                        width: target.offsetWidth || 0,
+                        height: target.offsetHeight || 0
+                    };
+                    // Allow resizing if mouse is at the bottom right corner
+                    if (event.offsetX >= target.offsetWidth - 10 && event.offsetY >= target.offsetHeight - 10) {
+                        isDragging = false;
+                        isResizing = true;
+                        resizingElement = target;
+                    }
+                }
+            }
+        });
+
+        document.getElementById('editingArea').addEventListener('mousemove', function(event) {
+            if (isDragging && draggingElement) {
+                const dx = event.clientX - dragStartPos.x;
+                const dy = event.clientY - dragStartPos.y;
+                draggingElement.style.left = alignToGrid(initialPos.x + dx) + 'px';
+                draggingElement.style.top = alignToGrid(initialPos.y + dy) + 'px';
+            } else if (isResizing && resizingElement) {
+                const widthChange = event.clientX - dragStartPos.x;
+                const heightChange = event.clientY - dragStartPos.y;
+                resizingElement.style.width = alignToGrid(initialSize.width + widthChange) + 'px';
+                resizingElement.style.height = alignToGrid(initialSize.height + heightChange) + 'px';
+            }
+        });
+
+        document.getElementById('editingArea').addEventListener('mouseup', function(event) {
+            event.stopPropagation();
+            setTimeout(() => {
+                isInteractionOngoing = false;
+            }, 500);            
+            isDragging = false;
+            isResizing = false;
+            if(null != dragStartPos) {
+                if(dragStartPos.x == event.clientX && dragStartPos.y == event.clientY) {
+                    showProperties(draggingElement);
+                }
+            }
+            draggingElement = null;
+            resizingElement = null;
+            
+        });
+
+        // Initialize with a new card
+        newCard();
+        switchMode('browse'); // Initialize with browse mode
+
+    </script>
+</body>
+</html>

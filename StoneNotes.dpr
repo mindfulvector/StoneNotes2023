@@ -15,7 +15,8 @@ uses
   InputQueryDropdown in 'InputQueryDropdown.pas',
   PluginEditor in 'PluginEditor.pas',
   ServerThread in 'ServerThread.pas',
-  WebSocketServer in 'WebSocketServer.pas';
+  WebSocketServer in 'WebSocketServer.pas',
+  UBrowserForm in 'UBrowserForm.pas' {BrowserForm};
 
 {$R *.res}
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-  <Transactions/>
-  <Default.Personality>
-    <Projects ActiveProject="D:\Dev\Projects\Embar\Projects\StoneNotes\Updater\StoneUpdate.dproj"/>
-  </Default.Personality>
+	<Transactions/>
+	<Default.Personality>
+		<Projects ActiveProject="D:\Dev\Projects\Embar\Projects\StoneNotes\StoneNotes.dproj"/>
+	</Default.Personality>
 </BorlandProject>

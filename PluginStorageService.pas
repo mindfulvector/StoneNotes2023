@@ -5,17 +5,17 @@ interface
 uses
   System.Classes, System.SysUtils, System.Rtti, System.JSON,
   System.NetEncoding, System.StrUtils,
-  FMX.TMSFNCWebBrowser, Logger, StringUtils;
+
+  Logger, StringUtils;
 
 type
   TPluginStorageService = class
   private
     FLayoutValues: TStringList;
-    FWebBrowser: TTMSFNCWebBrowser;
     FForPluginCommand: string;
   public
-    constructor Create(AWebBrowser: TTMSFNCWebBrowser; AForPluginCommand: string);
-    procedure OnBeforeNavigate(Sender: TObject; var EventParams: TTMSFNCCustomWebBrowserBeforeNavigateParams);
+    constructor Create(AForPluginCommand: string);
+    function InterceptRequestURL(URL: string): string;
     function ExecuteMethod(const AMethodName: string; AParams: TArray<TValue>): string;
     procedure WriteLayoutValue(AKey: string; AValue: string);
     function ReadLayoutValue(AKey: string): string;
@@ -26,37 +26,35 @@ type
 
 implementation
 
-constructor TPluginStorageService.Create(AWebBrowser: TTMSFNCWebBrowser; AForPluginCommand: string);
+constructor TPluginStorageService.Create(AForPluginCommand: string);
 begin
   inherited Create;
   FForPluginCommand := AForPluginCommand;
   FLayoutValues := TStringList.Create;
-  FWebBrowser := AWebBrowser;
-  FWebBrowser.OnBeforeNavigate := OnBeforeNavigate;
 end;
 
-procedure TPluginStorageService.OnBeforeNavigate(Sender: TObject; var EventParams: TTMSFNCCustomWebBrowserBeforeNavigateParams);
+// This function checks the provided URL and if it contains a method call,
+// calls that method then returns the results as a JSON string. If the
+// URL is not a method call to storage-service, then a blank string is
+// returned.
+function TPluginStorageService.InterceptRequestURL(URL: string): string;
 var
   MethodName: string;
   Params: TArray<TValue>;
-  Result: string;
   ParamsString: string;
   ParamsArray: TJSONArray;
   I: Integer;
   JobId: Integer;
-  URL: String;
   StorageServicePrefix: String;
   JsStringEncodedResult: string;
   JsLine: string;
 begin
-  URL := EventParams.URL;
+  Result := '';
   Log('Plugin resource request: '+URL);
   // Detect the file://storage-service prefix
   StorageServicePrefix := 'file://storage-service';
   if URL.StartsWith(StorageServicePrefix, True) then
   begin
-    EventParams.Cancel := true;
-
     // Parse the URL to extract the method name and parameters
     var SplitString := URL.Substring(Length(StorageServicePrefix)+1).Split(['/']);  // Remove the prefix and split by '/'
     if Length(SplitString) > 0 then
@@ -85,11 +83,10 @@ begin
       FlushLogBuffer;
       Result := ExecuteMethod(MethodName, Params);
       // Send Result back to JavaScript through the returnResult callback
-      JsStringEncodedResult := '"'+AddSlashes(Result)+'"';
-      Log('Sending plugin storage-service response: JobID='+IntToStr(JobId) + ';Result=' + JsStringEncodedResult);
-      JsLine := Format('PluginStorageService.returnResult(%d, %s)', [JobId, JsStringEncodedResult]);
+      //JsStringEncodedResult := '"'+AddSlashes(Result)+'"';
+      //Log('Sending plugin storage-service response: JobID='+IntToStr(JobId) + ';Result=' + JsStringEncodedResult);
+      //JsLine := Format('PluginStorageService.returnResult(%d, %s)', [JobId, JsStringEncodedResult]);
       Log(JsLine);
-      FWebBrowser.ExecuteJavaScript(JsLine);
     end;
   end;
 end;

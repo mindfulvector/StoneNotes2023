@@ -9,9 +9,7 @@ uses
 
   {framework}
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  FMX.Controls.Presentation, FMX.Edit, FMX.StdCtrls,
-  FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics, FMX.TMSFNCGraphicsTypes,
-  FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser, FMX.Styles,
+  FMX.Controls.Presentation, FMX.Edit, FMX.StdCtrls, FMX.Styles,
 
   {custom FMX compnents}
   FMX.SplitterPanel, FMX.BufferPanel,
@@ -31,6 +29,7 @@ type
     btnSaveAs: TButton;
     btnStyle: TButton;
     btnNew: TButton;
+    procedure CreateHandle; override;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure btnSplitRightClick(Sender: TObject);
@@ -44,6 +43,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
   private
     FFilename: string;
     FGlobalLayoutValues: TStringList;
@@ -52,6 +52,7 @@ type
     FLastSplitterLeft: TSplitterPanel;
     FPluginManager: TPluginManager;
     FServerThread: TServerThread;
+    FWndProcId: TFmxHandle;
     procedure UpdateWindowCaption;
     procedure StartServer;
     procedure StopServer;
@@ -70,6 +71,10 @@ implementation
 
 {$R *.fmx}
 
+uses
+  FMX.Platform, FMX.Platform.Win, Winapi.Messages, Winapi.CommCtrl,
+  uBrowserForm,
+  uNameDelphiThreads, uUnloadAllModules, uProcessCleanup;
 
 procedure TfrmStoneNotes.btnNewClick(Sender: TObject);
 var
@@ -156,6 +161,7 @@ begin
     Self.Caption := 'StoneNotes Matrix';
 end;
 
+
 procedure TfrmStoneNotes.btnSaveClick(Sender: TObject);
 var
   serializer: TSerializedSplitter;
@@ -191,18 +197,47 @@ begin
   FGlobalLayoutValues.Values['Style'] := ModifyAndApplyStyleToForm(Self);
 end;
 
-
 procedure TfrmStoneNotes.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Logger.Log('Main form closing');
+  TBrowserForm.EnumerateOpenForms;
   StopServer;
   FlushLogBuffer;
+  Application.Terminate;
+  Application.ProcessMessages;
+  UnloadAllModules;
+  TerminateProcessTree(GetCurrentProcessId);
 end;
+
+function StoneNotesSubclassProc(hWnd: HWND; uMsg: UINT; wParam: WPARAM; lParam: LPARAM;
+  uIdSubclass: UINT_PTR; dwRefData: DWORD_PTR): LRESULT; stdcall;
+var
+  Self: TfrmStoneNotes;
+begin
+  Self := TfrmStoneNotes(dwRefData);
+
+  case uMsg of
+    WM_MOVE: begin
+      Self.FSplitterPanel.ForceResize;
+    end;
+    WM_NCDESTROY:
+      RemoveWindowSubclass(hWnd, @StoneNotesSubclassProc, uIdSubclass);
+  end;
+  Result := DefSubclassProc(hWnd, uMsg, wParam, lParam);
+end;
+
+procedure TfrmStoneNotes.CreateHandle;
+begin
+  inherited;
+  SetWindowSubclass(FormToHWND(Self), @StoneNotesSubclassProc, 1, DWORD_PTR(Self));
+end;
+
 
 procedure TfrmStoneNotes.FormCreate(Sender: TObject);
 var
   PluginCount: integer;
 begin
+
   FPluginManager := TPluginManager.Create;
   PluginCount := FPluginManager.LoadPlugins;
   if PluginCount = 0 then
@@ -243,6 +278,12 @@ begin
       end;
 end;
 
+procedure TfrmStoneNotes.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Single);
+begin
+  FSplitterPanel.ForceResize;
+end;
+
 procedure TfrmStoneNotes.FormResize(Sender: TObject);
 begin
   FSplitterPanel.SetBounds(5, btnSplitRight.Height + 10, Self.Width - 25, Self.Height - 90);
@@ -278,6 +319,20 @@ begin
     JSONObject.Free;
   end;
 end;
+
+
+// Needed for subclassing to work?
+procedure InitStandardClasses;
+var
+  ICC: TInitCommonControlsEx;
+begin
+  ICC.dwSize := SizeOf(TInitCommonControlsEx);
+  ICC.dwICC := ICC_STANDARD_CLASSES;
+  InitCommonControlsEx(ICC);
+end;
+
+initialization
+  InitStandardClasses;  // Needed for subclassing to work?
 
 end.
 

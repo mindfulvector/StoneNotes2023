@@ -11,6 +11,7 @@ object frmStoneNotes: TfrmStoneNotes
   OnClose = FormClose
   OnDeactivate = FormDeactivate
   OnKeyDown = FormKeyDown
+  OnMouseMove = FormMouseMove
   OnResize = FormResize
   DesignerMasterStyle = 0
   object btnSplitRight: TButton

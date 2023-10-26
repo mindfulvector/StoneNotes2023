@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.Types, System.UITypes, FMX.Controls, FMX.Types,
-  FMX.Graphics, FMX.Objects,
+  FMX.Graphics, FMX.Objects, System.SysUtils,
   FMX.BufferPanel,
   PluginManager;
 
@@ -12,10 +12,10 @@ type
   TSplitDirection = (sdVertical, sdHorizontal);
   TSide = (LeftTop, RightBottom);
 
-  TSplitterPanel = class(TControl)
+  TSplitterPanel = class(TStoneNotesPanel)
   private
     FSplitDirection: TSplitDirection;
-    FLeftControl, FRightControl: TControl;
+    FLeftControl, FRightControl: TStoneNotesPanel;
     FSplitterPosition: Integer;
     IsCaptured: Boolean;
     FPluginManager: TPluginManager;
@@ -29,14 +29,15 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure SetSplitDirection(const Value: TSplitDirection);
     function SplitSide(ASide: TSide): TSplitterPanel;
-    procedure Unsplit(AKeepControl: TControl);
-    procedure SetLeftControl(const Value: TControl);
-    procedure SetRightControl(const Value: TControl);
+    procedure Unsplit(AKeepControl: TStoneNotesPanel);
+    procedure SetLeftControl(const Value: TStoneNotesPanel);
+    procedure SetRightControl(const Value: TStoneNotesPanel);
+    procedure ForceResize; override;
   published
     property SplitDirection: TSplitDirection read FSplitDirection write SetSplitDirection;
     property SplitterPosition: integer read FSplitterPosition write FSplitterPosition;
-    property LeftControl: TControl read FLeftControl write FLeftControl;
-    property RightControl: TControl read FRightControl write FRightControl;
+    property LeftControl: TStoneNotesPanel read FLeftControl write FLeftControl;
+    property RightControl: TStoneNotesPanel read FRightControl write FRightControl;
   end;
 
 implementation
@@ -50,6 +51,13 @@ begin
   FPluginManager := APluginManager;
   FSplitterPosition := 50;
   FSplitDirection := sdVertical; // Default direction
+end;
+
+procedure TSplitterPanel.ForceResize;
+begin
+  inherited;
+  FLeftControl.ForceResize;
+  RightControl.ForceResize;
 end;
 
 function TSplitterPanel.CalcSplitterPositionPixels: Single;
@@ -75,7 +83,7 @@ begin
   end;
 end;
 
-procedure TSplitterPanel.SetLeftControl(const Value: TControl);
+procedure TSplitterPanel.SetLeftControl(const Value: TStoneNotesPanel);
 begin
   if (Value = nil) or (FLeftControl <> Value) then
   begin
@@ -93,7 +101,7 @@ begin
   end;
 end;
 
-procedure TSplitterPanel.SetRightControl(const Value: TControl);
+procedure TSplitterPanel.SetRightControl(const Value: TStoneNotesPanel);
 begin
   if (Value = nil) or (FRightControl <> Value) then
   begin
@@ -106,6 +114,7 @@ begin
 
     Self.InsertComponent(FRightControl);
     FRightControl.Parent := Self;
+
     Resize;
   end;
 end;
@@ -277,7 +286,7 @@ begin
   SplitSide := NewSplitterPanel;
 end;
 
-procedure TSplitterPanel.Unsplit(AKeepControl: TControl);
+procedure TSplitterPanel.Unsplit(AKeepControl: TStoneNotesPanel);
 var
   parentPanel: TSplitterPanel;
 begin

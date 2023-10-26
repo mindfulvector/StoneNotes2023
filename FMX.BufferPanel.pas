@@ -6,23 +6,29 @@ uses
   System.SysUtils, System.Classes, System.UITypes, System.Types,
   System.IOUtils, System.StrUtils,
   FMX.Controls, FMX.StdCtrls, FMX.Types, FMX.Layouts, FMX.Edit,
-  FMX.Memo, FMX.Graphics,
-  FMX.TMSFNCTypes, FMX.TMSFNCUtils, FMX.TMSFNCGraphics,
-  FMX.TMSFNCGraphicsTypes, FMX.TMSFNCCustomControl, FMX.TMSFNCWebBrowser,
-
-  StringUtils, PluginManager, PluginStorageService, PluginEditor;
+  FMX.Memo, FMX.Graphics, FMX.Forms,
+  StringUtils, PluginManager, PluginStorageService, PluginEditor,
+  uBrowserForm;
 
 type
-  TBufferPanel = class(TPanel)
+  TStoneNotesPanel = class(TPanel)
+  public
+    procedure ForceResize; virtual;
+  end;
+
+  TBufferPanel = class(TStoneNotesPanel)
   private
     FCommandEdit: TEdit;
     FGoButton: TButton;
     FCommandControl: TControl;
+    FWindowChild: TCustomForm;
     FCloseButton: TButton;
     FBufferIdLabel: TLabel;
     FBufferID: integer;
     FPluginManager: TPluginManager;
     FPluginStorageService: TPluginStorageService;
+    FMessagePanel: TPanel;
+    FMessageMemo: TMemo;
     procedure GoButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
@@ -37,6 +43,7 @@ type
     procedure Resize; override;
   public
     constructor Create(AOwner: TComponent; APluginManager: TPluginManager);
+    destructor Destroy; override;
 
     function BufferID: integer;
     procedure SetBufferID(ABufferID: integer);
@@ -46,6 +53,8 @@ type
 
     function Properties: string;
     procedure SetProperties(SProperties: string);
+
+    procedure ForceResize; override;
   end;
 
   procedure TriggerGoButton(BufferID: integer);
@@ -54,12 +63,22 @@ type
 implementation
 
 uses
-  FMX.SplitterPanel;
+  FMX.SplitterPanel, MainForm;
 
 var
   LastBufferID: Integer = 0;
   GoButtons: array of TButton;
   CloseButtons: array of TButton;
+
+
+{ TStoneNotesPanel }
+
+procedure TStoneNotesPanel.ForceResize;
+begin
+
+end;
+
+{ TBufferPanel }
 
 constructor TBufferPanel.Create(AOwner: TComponent; APluginManager: TPluginManager);
 begin
@@ -100,6 +119,22 @@ begin
   FCloseButton.Text := ':Q';
   FCloseButton.Position.X := Self.Width - FCloseButton.Width;
   FCloseButton.Position.Y := 0;
+
+  FMessagePanel := TPanel.Create(Self);
+  FMessagePanel.Parent := Self;
+  FMessagePanel.Width := Self.Width - 20;
+  FMessagePanel.Height := Self.Width - FCommandEdit.Position.Y - FCommandEdit.Height - 20;
+  FMessagePanel.Position.X := 10;
+  FMessagePanel.Position.Y := FCommandEdit.Position.Y + FCommandEdit.Height + 20;
+
+  FMessageMemo := TMemo.Create(Self);
+  FMessageMemo.Parent := FMessagePanel;
+  FMessageMemo.Width := FMessagePanel.Width - 20;
+  FMessageMemo.Height := FMessagePanel.Height - 20;
+  FMessageMemo.Position.X := 10;
+  FMessageMemo.Position.Y := 10;
+
+  FMessagePanel.Visible := false;
 
   FCommandEdit.OnKeyDown := CommandEditKeyDown;
   FGoButton.OnClick := GoButtonClick;
@@ -166,11 +201,8 @@ begin
   if FCommandControl is TMemo then
     Properties := TMemo(FCommandControl).Text;
 
-  if FCommandControl is TTMSFNCWebBrowser then
-  begin
-    if Assigned(FPluginStorageService) then
-      Properties := FPluginStorageService.GetAllLayoutValues;
-  end;
+  if Assigned(FPluginStorageService) then
+    Properties := FPluginStorageService.GetAllLayoutValues;
 end;
 
 // Restore properties to the buffer command component.
@@ -181,12 +213,9 @@ begin
     TMemo(FCommandControl).Text := SProperties;
   end;
 
-  if FCommandControl is TTMSFNCWebBrowser then
+  if Assigned(FPluginStorageService) then
   begin
-    if Assigned(FPluginStorageService) then
-    begin
-      FPluginStorageService.SetAllLayoutValues(SProperties)
-    end;
+    FPluginStorageService.SetAllLayoutValues(SProperties)
   end;
 end;
 
@@ -265,10 +294,10 @@ begin
 
         // Create new storage service for this command if needed
         if not Assigned(FPluginStorageService) then
-          FPluginStorageService := TPluginStorageService.Create(TTMSFNCWebBrowser(FCommandControl), String.Join(' ', command));
+          FPluginStorageService := TPluginStorageService.Create(String.Join(' ', command));
 
         // Load it!
-        TTMSFNCWebBrowser(FCommandControl).Navigate(FileURL);
+        //TTMSFNCWebBrowser(FCommandControl).Navigate(FileURL);
       end else begin
         DisplayError('Error: Command is registered to plugin '
                       +'"'+Plugin.DirName+'", '
@@ -294,10 +323,11 @@ end;
 procedure TBufferPanel.BufferCommandBrowser(command: TArray<System.string>);
 begin
   CreateBrowser;
+  {
   if Length(command) = 1 then
-    TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com')
-  else
   begin
+    TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com')
+  end else begin
     if command[1].StartsWith('http://')
         or command[1].StartsWith('https://')
         or command[1].StartsWith('file://')
@@ -306,11 +336,13 @@ begin
     else
       TTMSFNCWebBrowser(FCommandControl).Navigate('https://' + command[1]);
   end;
+  }
 end;
 
 // M - Basic memo field
 procedure TBufferPanel.BufferCommandMemo(command: TArray<System.string>);
 begin
+  FMessagePanel.Visible := false;
   if Assigned(FCommandControl) then
     FCommandControl.DisposeOf;
   FCommandControl := TMemo.Create(Self);
@@ -327,6 +359,7 @@ end;
 // EPLG - Plugin editor
 procedure TBufferPanel.BufferCommandPluginEditor(command: TArray<System.string>);
 begin
+  FMessagePanel.Visible := false;
   if Assigned(FCommandControl) then
     FCommandControl.DisposeOf;
   FCommandControl := TPluginEditor.Create(Self);
@@ -342,21 +375,51 @@ end;
 
 
 // Error display helper
+destructor TBufferPanel.Destroy;
+begin
+  if Assigned(FWindowChild) then
+  begin
+    Self.RemoveComponent(FWindowChild);
+    FWindowChild.Free;
+    FWindowChild := nil;
+  end;
+  inherited;
+end;
+
 procedure TBufferPanel.DisplayError(AMessage: String);
 begin
-  CreateBrowser;
-  TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
+  FMessagePanel.Visible := true;
+  FMessageMemo.Text := AMessage;
+  FMessageMemo.ReadOnly := True;
   Resize;
-  TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>'
-  +'<div style="border: 1px solid red; margin: 10px; padding: 10px;">'
-  +AMessage+'</div>');
+end;
+
+procedure TBufferPanel.ForceResize;
+begin
+  Resize;
 end;
 
 // Create* methods should create a buffer component used by multiple buffer
 // commands. CreateBrowser is used by the base B command as well as HTML/CSS/JS
 // plugins and the error display helper.
 procedure TBufferPanel.CreateBrowser;
+var
+  browser: TBrowserForm;
 begin
+  FMessagePanel.Visible := false;
+  //DisplayError('Browser disabled in this build!');
+
+  browser := TBrowserForm.Create(nil);
+  FWindowChild := browser;
+
+  browser.Parent := self;
+  // Move the browser's children to us
+  //while browser.ChildrenCount > 0 do
+  //  browser.Children[0].Parent := Self;
+  Self.InsertComponent(browser);
+  browser.Visible := True;
+
+  (*
   if Assigned(FCommandControl) and (not (FCommandControl is TTMSFNCWebBrowser)) then
     FCommandControl.DisposeOf;
   if not (FCommandControl is TTMSFNCWebBrowser) then
@@ -375,13 +438,19 @@ begin
   end;
   FCommandControl.SetFocus;
   TTMSFNCWebBrowser(FCommandControl).LoadHTML('<style>* { background: #000; color: #FFF;}</style>');
+  *)
   Resize;
 end;
 
 // Keep buffer components visible and using the full buffer space
 procedure TBufferPanel.Resize;
+var
+  AbsolutePos: TPointF;
 begin
   inherited;
+
+  // Convert the control's local position to its position relative to the form
+  AbsolutePos := Self.LocalToAbsolute(PointF(0, 0));
 
   // Basic chrome for buffer itself
   FCommandEdit.SetBounds(
@@ -392,6 +461,10 @@ begin
   FGoButton.Position.X := Width - FGoButton.Width - 10;
 
   FCloseButton.Position.X := Self.Width - FCloseButton.Width;
+  FMessagePanel.Width := Self.Width - 20;
+  FMessagePanel.Height := Self.Height - FMessagePanel.Position.Y - 20;
+  FMessageMemo.Width := FMessagePanel.Width - 20;
+  FMessageMemo.Height := FMessagePanel.Height - 20;
 
   // Resize the component
   if Assigned(FCommandControl) then
@@ -400,14 +473,22 @@ begin
             {y}FGoButton.Position.Y + FGoButton.Height + 10,
             {w}Width,
             {h}Height - (FGoButton.Position.Y + FGoButton.Height + 10));
+
+  if Assigned(FWindowChild) then
+  begin
+    FWindowChild.Left := Round(AbsolutePos.X + frmStoneNotes.Left + TSplitterPanel(Self.Owner).LocalToAbsolute(PointF(0, 0)).X + 5);
+    FWindowChild.Top := Round(Self.Top + frmStoneNotes.Top + TSplitterPanel(Self.Owner).LocalToAbsolute(PointF(0, 0)).Y + FGoButton.Position.Y + FGoButton.Height + 45);
+    FWindowChild.Width := Round(Self.Width) - 5;
+    FWindowChild.Height := Round(Self.Height - FGoButton.Position.Y - FGoButton.Height - 10);
+  end;
 end;
 
 procedure TBufferPanel.GoButtonClick(Sender: TObject);
 var
   command: TStringDynArray;
 begin
-  if FCommandEdit.IsFocused then
-  begin
+  //if FCommandEdit.IsFocused then
+  //begin
     command := SplitString(FCommandEdit.Text);
     if Length(command) = 0 then
     begin
@@ -434,14 +515,15 @@ begin
     if nil = FCommandControl then ScanForPluginCmd(command);
 
     // Invalid command, bummer!
-    if nil = FCommandControl then DisplayError('Error: Unknown command.');
+    if (nil = FCommandControl) and (nil = FWindowChild) and not FMessagePanel.Visible then DisplayError('Error: Unknown command.');
 
     // Prepare to enter new command
     FCommandEdit.SelectAll;
-  end else begin
-    FCommandEdit.SetFocus;
-  end;
+  //end else begin
+  //  FCommandEdit.SetFocus;
+  //end;
 end;
+
 
 procedure TBufferPanel.CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
 begin
@@ -451,6 +533,7 @@ begin
     Key := 0;  // Prevent default beep
   end;
 end;
+
 
 end.
 

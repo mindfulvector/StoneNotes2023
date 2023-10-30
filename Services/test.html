@@ -1,0 +1,21 @@
+<h1>It works!</h1>
+<p>This is a test of a static resource.</p>
+<p>These extensions are treated as static files:
+	<ul>
+		<li>.js</li>
+		<li>.html</li>
+		<li>.css</li>
+		<li>.jpg</li>
+		<li>.png</li>
+		<li>.gif</li>
+	</ul>
+</p>
+
+<h2>Not really CGI!</h2>
+<p>Files <b>other than</b> <i>server.ts</i> with the .ts extension will be executed as CGI-like scripts:</p>
+<ul>
+	<li>Request information will come in on STDIN as a JSON blob.</li>
+	<li>You should send your reply as HTML or JSON on STDOUT.</li>
+	<li>Any error in STDERR will cause a generic error to be returned, the error will be logged.</li>
+</ul>
+

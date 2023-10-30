@@ -16,7 +16,10 @@ uses
   PluginEditor in 'PluginEditor.pas',
   ServerThread in 'ServerThread.pas',
   WebSocketServer in 'WebSocketServer.pas',
-  UBrowserForm in 'UBrowserForm.pas' {BrowserForm};
+  UBrowserForm in 'UBrowserForm.pas' {BrowserForm},
+  uNameDelphiThreads in 'uNameDelphiThreads.pas',
+  uUnloadAllModules in 'uUnloadAllModules.pas',
+  uProcessCleanup in 'uProcessCleanup.pas';
 
 {$R *.res}
 

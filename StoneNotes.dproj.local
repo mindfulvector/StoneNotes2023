@@ -14,8 +14,8 @@
     <Transaction>2023/10/14 17:24:03.000.691,D:\Dev\Projects\Embar\Projects\StoneNotes\StoneNotes.dproj=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>2023/10/14 17:26:42.000.366,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
     <Transaction>2023/10/14 17:27:00.000.221,D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.SplitterPanel.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/10/14 17:27:44.000.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/14 17:27:44.000.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.fmx=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx</Transaction>
+    <Transaction>2023/10/14 17:27:44.000.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/14 19:58:49.000.825,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/14 19:59:33.000.912,D:\Dev\Projects\Embar\Projects\StoneNotes\SplitterSerializer.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/15 12:06:15.000.557,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
@@ -41,5 +41,16 @@
     <Transaction>2023/10/25 17:15:09.000.671,=D:\Dev\Projects\Embar\Projects\StoneNotes\BrowserForm.pas</Transaction>
     <Transaction>2023/10/25 17:17:54.000.329,D:\Dev\Projects\Embar\Projects\StoneNotes\BrowserForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\UBrowserForm.pas</Transaction>
     <Transaction>2023/10/25 17:17:54.000.329,D:\Dev\Projects\Embar\Projects\StoneNotes\BrowserForm.fmx=D:\Dev\Projects\Embar\Projects\StoneNotes\UBrowserForm.fmx</Transaction>
+    <Transaction>2023/10/25 20:11:29.000.302,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/25 20:11:40.000.028,D:\Dev\Projects\Embar\Projects\StoneNotes\ThreadList.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/25 20:21:47.000.190,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/25 20:21:54.000.400,D:\Dev\Projects\Embar\Projects\StoneNotes\uNameDelphiThreads.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/25 20:29:14.000.793,D:\Dev\Projects\Embar\Projects\StoneNotes\uNameDelphiThreads.pas=</Transaction>
+    <Transaction>2023/10/25 20:29:19.000.603,D:\Dev\Projects\Embar\Projects\StoneNotes\ThreadList.pas=</Transaction>
+    <Transaction>2023/10/25 20:29:29.000.276,=D:\Dev\Projects\Embar\Projects\StoneNotes\uNameDelphiThreads.pas</Transaction>
+    <Transaction>2023/10/25 20:34:28.000.115,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/25 20:35:36.000.766,D:\Dev\Projects\Embar\Projects\StoneNotes\uUnloadAllModules.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/25 20:59:59.000.719,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/25 21:00:46.000.526,D:\Dev\Projects\Embar\Projects\StoneNotes\uProcessCleanup.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
   </Transactions>
 </BorlandProject>

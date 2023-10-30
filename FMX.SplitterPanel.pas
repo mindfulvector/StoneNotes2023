@@ -139,9 +139,10 @@ begin
   end;
 
   // Splitter
-  Canvas.FillRect(R, 0, 0, [], 1, TBrush.Create(TBrushKind.Solid, TAlphaColorRec.Black));
+  Canvas.FillRect(R, 0, 0, [], 1, TBrush.Create(TBrushKind.Solid, TAlphaColorRec.DkGray));
 
   // Draw panel backgrounds
+  {
   R := LocalRect;
   case FSplitDirection of
     sdVertical:
@@ -165,7 +166,7 @@ begin
       R.Bottom := CalcSplitterPositionPixels + 2;
     end;
   end;
-
+  }
 end;
 
 procedure TSplitterPanel.Resize;
@@ -246,6 +247,9 @@ begin
       sdVertical: FSplitterPosition := Round(X / Self.Width * 100);
       sdHorizontal: FSplitterPosition := Round(Y / Self.Height * 100);
     end;
+    if FSplitterPosition < 10 then FSplitterPosition := 10;
+    if FSplitterPosition > 90 then FSplitterPosition := 90;
+
     Resize;
     Repaint;
   end;

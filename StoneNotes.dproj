@@ -287,6 +287,9 @@
             <Form>BrowserForm</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="uNameDelphiThreads.pas"/>
+        <DCCReference Include="uUnloadAllModules.pas"/>
+        <DCCReference Include="uProcessCleanup.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

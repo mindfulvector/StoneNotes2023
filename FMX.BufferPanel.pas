@@ -32,7 +32,7 @@ type
     procedure GoButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
-    procedure CreateBrowser;
+    procedure CreateBrowser(ARequestedURL: string);
     procedure BufferCommandMemo(command: TArray<System.string>);
     procedure BufferCommandBrowser(command: TArray<System.string>);
     procedure ScanForPluginCmd(command: TArray<System.string>);
@@ -322,21 +322,19 @@ end;
 // B - Basic web browser
 procedure TBufferPanel.BufferCommandBrowser(command: TArray<System.string>);
 begin
-  CreateBrowser;
-  {
+  CreateBrowser('https://duckduckgo.com');
   if Length(command) = 1 then
   begin
-    TTMSFNCWebBrowser(FCommandControl).Navigate('https://duckduckgo.com')
+    TBrowserForm(FWindowChild).RequestedURL := 'https://duckduckgo.com';
   end else begin
-    if command[1].StartsWith('http://')
-        or command[1].StartsWith('https://')
-        or command[1].StartsWith('file://')
-        or command[1].StartsWith('data://')  then
-      TTMSFNCWebBrowser(FCommandControl).Navigate(command[1])
-    else
-      TTMSFNCWebBrowser(FCommandControl).Navigate('https://' + command[1]);
+//    if command[1].StartsWith('http://')
+//        or command[1].StartsWith('https://')
+//        or command[1].StartsWith('file://')
+//        or command[1].StartsWith('data://')  then
+//      TTMSFNCWebBrowser(FCommandControl).Navigate(command[1])
+//    else
+//      TTMSFNCWebBrowser(FCommandControl).Navigate('https://' + command[1]);
   end;
-  }
 end;
 
 // M - Basic memo field
@@ -402,7 +400,7 @@ end;
 // Create* methods should create a buffer component used by multiple buffer
 // commands. CreateBrowser is used by the base B command as well as HTML/CSS/JS
 // plugins and the error display helper.
-procedure TBufferPanel.CreateBrowser;
+procedure TBufferPanel.CreateBrowser(ARequestedURL: string);
 var
   browser: TBrowserForm;
 begin

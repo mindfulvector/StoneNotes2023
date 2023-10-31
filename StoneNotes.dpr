@@ -19,7 +19,8 @@ uses
   UBrowserForm in 'UBrowserForm.pas' {BrowserForm},
   uNameDelphiThreads in 'uNameDelphiThreads.pas',
   uUnloadAllModules in 'uUnloadAllModules.pas',
-  uProcessCleanup in 'uProcessCleanup.pas';
+  uProcessCleanup in 'uProcessCleanup.pas',
+  uServerMonitor in 'uServerMonitor.pas';
 
 {$R *.res}
 

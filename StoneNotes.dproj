@@ -290,6 +290,7 @@
         <DCCReference Include="uNameDelphiThreads.pas"/>
         <DCCReference Include="uUnloadAllModules.pas"/>
         <DCCReference Include="uProcessCleanup.pas"/>
+        <DCCReference Include="uServerMonitor.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

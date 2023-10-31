@@ -74,7 +74,8 @@ implementation
 uses
   FMX.Platform, FMX.Platform.Win, Winapi.Messages, Winapi.CommCtrl,
   uBrowserForm,
-  uNameDelphiThreads, uUnloadAllModules, uProcessCleanup;
+  uNameDelphiThreads, uUnloadAllModules, uProcessCleanup,
+  uServerMonitor;
 
 procedure TfrmStoneNotes.btnNewClick(Sender: TObject);
 var
@@ -236,6 +237,8 @@ end;
 procedure TfrmStoneNotes.FormCreate(Sender: TObject);
 var
   PluginCount: integer;
+  ServerMonitor: TServerMonitor;
+  InstallDir: string;
 begin
 
   FPluginManager := TPluginManager.Create;
@@ -257,6 +260,16 @@ begin
   Resize;
 
   StartServer;
+
+  InstallDir := ExtractFileDir(ParamStr(0));
+  if not FileExists(InstallDir+'\Services\server.ts') then
+    InstallDir := ExtractFileDir(InstallDir);
+  if not FileExists(InstallDir+'\Services\server.ts') then
+    InstallDir := ExtractFileDir(InstallDir);
+
+  ServerMonitor := TServerMonitor.Create(True);
+  ServerMonitor.Directory := InstallDir + '\Services';
+  ServerMonitor.Resume;
 end;
 
 procedure TfrmStoneNotes.FormDeactivate(Sender: TObject);

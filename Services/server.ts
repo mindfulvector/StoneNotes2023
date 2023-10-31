@@ -1,23 +1,48 @@
+// System / third party
 import { serve } from "https://deno.land/std/http/server.ts";
 import { parse } from "https://deno.land/std/flags/mod.ts";
 import { extname, join, relative, resolve } from "https://deno.land/std/path/mod.ts";
 
-const args = parse(Deno.args);
-const docRoot = args._[0] as string;
+// Local modules
+import { DateUtils } from "./DateUtils.lib.ts";
 
+// Arguments to this script, which forms the root level backend process for StoneNotes,
+// are usually passed in via the server_monitor.c program. See that program for details
+// of the arguments passed here.
+const args = parse(Deno.args);
+let docRoot = args._[0] as string;
+if(docRoot.indexOf('/') != docRoot.Length - 1) {
+  docRoot += '/';
+}
 
 const isValidExt = (ext: string) => ["html", "js", "css", "png", "jpg", "gif"].includes(ext);
 const isBlockedExt = (ext: string) => ["txt", "ini"].includes(ext);
 
-// For todays date;
-Date.prototype.today = function () { 
-    return ((this.getDate() < 10)?"0":"") + this.getDate() +"/"+(((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) +"/"+ this.getFullYear();
+// Function to print a divider bar with centered date and time
+function printBarWithDateAndTime() {
+    const dateStr = DateUtils.dateToday() + " " + DateUtils.timeNow();
+    const barLength = 60;
+    const padding = Math.floor((barLength - dateStr.length) / 2);
+    const bar = "*".repeat(padding) + dateStr + "*".repeat(barLength - padding - dateStr.length);
+    console.error(bar);
 }
 
-// For the time now
-Date.prototype.timeNow = function () {
-     return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+// Listen to stdin for console commands
+// Pressing enter with a blank line will print the divider bar with date and time
+async function listenForEnterKeyPress() {
+    const buf = new Uint8Array(1024);
+    while (true) {
+        const n = <number>await Deno.stdin.read(buf);
+        const answer = new TextDecoder().decode(buf.subarray(0, n));
+        if ("" === answer.trim()) {
+            printBarWithDateAndTime();
+        } else {
+          console.error('Unknown command');
+        }
+    }
 }
+
+listenForEnterKeyPress();
 
 const server = Deno.serve({ port: 64769 }, async (req: Request, info: ServeHandlerInfo) => {
   const arr = req.url.replace('http://','').replace('https://').split("/");
@@ -25,14 +50,16 @@ const server = Deno.serve({ port: 64769 }, async (req: Request, info: ServeHandl
   const fsPath = docRoot + uriPath;
   const relPath = relative(docRoot, fsPath);
   
-  console.log(`Request on ${new Date().today()} at ${new Date().timeNow()}: req.url: ${req.url}`);
+  if(-1 !== fsPath.indexOf('/favicon.ico')) return new Response("", { status: 404 });;
+
+  console.log(`Request on ${DateUtils.dateToday()} at ${DateUtils.timeNow()}: req.url: ${req.url}`);
   // console.log(`segments: ${arr.length}`);
   
   // console.log(`docRoot: ${docRoot}`);
   // console.log(`uriPath: ${uriPath}`);
   // console.log(`fsPath: ${fsPath}`);
 
-  if (relPath.includes("..") || relPath[0] == '/' || relPath[1] == ':' || relPath[0] == '\\') {
+  if (uriPath.includes("..")) {
     return new Response("Access denied", { status: 403 });
   }
 
@@ -100,11 +127,11 @@ const server = Deno.serve({ port: 64769 }, async (req: Request, info: ServeHandl
           contentType = 'image/png';
           break;          
         case 'gif':
-          contentType = 'image/gif';
+          contentType = 'image/gif';  
           break;          
         }
         return new Response(file, { status: 200, headers: { "content-type": "${contentType}; charset=utf-8" }});
-      } else if (ext === "ts" /* || ext === "php" */) {
+      } else if (ext === "ts" && -1 === fsPath.indexOf('.lib.ts')) {  // Don't allow executing .lib.ts files
         let cmd = [];
         if (ext === "ts") {
           cmd = ["deno", "run", "--allow-read", "--allow-write", "--allow-net", "--allow-run", fsPath]

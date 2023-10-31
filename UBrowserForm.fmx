@@ -50,7 +50,6 @@ object BrowserForm: TBrowserForm
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Align = Client
       TabOrder = 0
-      Text = 'about:blank'
       Size.Width = 949.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False

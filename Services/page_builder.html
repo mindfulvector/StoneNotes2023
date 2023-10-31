@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Page Builder</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+
+<div id="pageBuilderWrapper">
+    <div id="buttonBar">
+        <button id="createBlockBtn">Create Block</button>
+        <button id="savePageBtn">Save Page</button>
+        <button id="previewPageBtn">Preview</button>
+    </div>
+    <div id="editableRegion"></div>
+    <div id="previewRegion"></div>
+</div>
+
+<script>
+// BackendDriver Class
+class BackendDriver {
+    constructor() {
+        this.publishedPage = [];
+        this.draftPage = [];
+        this.revisions = [];
+    }
+
+    generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = (Math.random() * 16) | 0,
+                v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
+    saveDraft(blocks) {
+        const jsonBlocks = JSON.stringify(blocks);
+        this.draftPage = jsonBlocks;
+    }
+  
+    
+    publishDraft() {
+        this.revisions.push(this.publishedPage);
+        this.publishedPage = this.draftPage;
+        this.draftPage = [];
+    }
+  
+    loadDraft() {
+        return JSON.parse(this.draftPage);
+    }
+
+    loadPublished() {
+        return JSON.parse(this.publishedPage);
+    }
+  
+    loadRevision(index) {
+        return JSON.parse(this.revisions[index]);
+    }
+}
+
+// Generate block element function
+function createBlockElement(uuid, title, content) {
+    return $("<div class='pageBlock' data-uuid='" + uuid + "' data-title='" + title + "'><div class='content'>" + content + "</div></div>");
+}
+
+// Page Builder jQuery Plugin
+$.fn.pageBuilder = function() {
+    var editableRegion = this.find("#editableRegion");
+    var createBlockBtn = this.find("#createBlockBtn");
+    var savePageBtn = this.find("#savePageBtn");
+
+    // Initialize BackendDriver
+    var backendDriver = new BackendDriver();
+
+    // Load Draft Page
+    var draftBlocks = backendDriver.loadDraft();
+    if (draftBlocks) {
+        draftBlocks.forEach(function(block) {
+            var blockElement = createBlockElement(block.uuid, block.title, block.content);
+            blockElement.draggable().resizable();
+            editableRegion.append(blockElement);
+        });
+    }
+
+    // Save Page Button Event
+    savePageBtn.click(function() {
+        var blocks = [];
+        editableRegion.find('.pageBlock').each(function() {
+            var block = {
+                uuid: $(this).data('uuid'),
+                title: $(this).data('title'),
+                content: $(this).find('.content').html()
+            };
+            blocks.push(block);
+        });
+        backendDriver.saveDraft(blocks);
+    });
+
+
+    // Create block
+    createBlockBtn.click(function() {
+        var newUUID = backendDriver.generateUUID();
+        var defaultTitle = "New Block";
+        var defaultContent = "Block Content";
+
+        var newBlock = createBlockElement(newUUID, defaultTitle, defaultContent);
+
+        newBlock.draggable().resizable();
+        editableRegion.append(newBlock);
+    });
+
+    // Edit block
+    editableRegion.on('click', '.pageBlock', function(event) {
+        event.stopPropagation();
+        var blockUUID = $(this).data('uuid');
+        var blockTitle = $(this).data('title');
+        var blockContent = $(this).find('.content').html();
+
+        var editModal = $('<div class="editModal"><input class="title" value="' + blockTitle + '"/><textarea class="content">' + blockContent + '</textarea><button class="save">Save</button><button class="cancel">Cancel</button></div>');
+        $('body').append(editModal);
+
+        editModal.on('click', '.save', function() {
+            var newContent = editModal.find("textarea.content").val();
+            var newTitle = editModal.find("input.title").val();
+            editModal.remove();
+
+            // Update existing block with new content and title
+            var updatedBlock = createBlockElement(blockUUID, newTitle, newContent);
+            $(this).replaceWith(updatedBlock);
+            updatedBlock.draggable().resizable();
+        });
+
+        editModal.on('click', '.cancel', function() {
+            editModal.remove();
+        });
+    });
+
+
+    // Preview Page Event
+    var previewRegion = this.find("#previewRegion");
+    var previewPageBtn = this.find("#previewPageBtn");
+    
+    previewPageBtn.click(function() {
+        previewRegion.empty();
+        var blocks = backendDriver.loadDraft();
+        blocks.forEach(function(block) {
+            var blockElement = $("<div>" + block.content + "</div>");
+            previewRegion.append(blockElement);
+        });
+    });
+
+    // Initialize plugin on document.ready
+    $(document).ready(function() {
+        $("#pageBuilderWrapper").pageBuilder();
+    });
+};
+
+// Attach the plugin to the wrapper element
+$(document).ready(function() {
+    $("#pageBuilderWrapper").pageBuilder();
+});
+</script>
+
+<!-- CSS Styling -->
+<style>
+    #pageBuilderWrapper {
+        display: flex;
+    }
+    #editableRegion, #previewRegion {
+        width: 50%;
+    }
+    .pageBlock {
+        border: 1px solid #ccc;
+        margin: 5px;
+    }
+    .editModal {
+        position: fixed;
+        z-index: 1000;
+        background: white;
+        padding: 20px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+
+</body>
+</html>

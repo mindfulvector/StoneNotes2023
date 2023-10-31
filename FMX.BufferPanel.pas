@@ -235,7 +235,6 @@ begin
   Plugin := FPluginManager.FindPluginByCommand(command[0]);
   if Assigned(Plugin) then
   begin
-    CreateBrowser;
     if Assigned(Plugin.Settings) then
     begin
       PluginPage := Plugin.Settings.Values['plugin/command_' + command[0]];
@@ -298,6 +297,7 @@ begin
 
         // Load it!
         //TTMSFNCWebBrowser(FCommandControl).Navigate(FileURL);
+        CreateBrowser(FileURL);
       end else begin
         DisplayError('Error: Command is registered to plugin '
                       +'"'+Plugin.DirName+'", '
@@ -322,18 +322,18 @@ end;
 // B - Basic web browser
 procedure TBufferPanel.BufferCommandBrowser(command: TArray<System.string>);
 begin
-  CreateBrowser('https://duckduckgo.com');
+
   if Length(command) = 1 then
   begin
-    TBrowserForm(FWindowChild).RequestedURL := 'https://duckduckgo.com';
+    CreateBrowser('https://duckduckgo.com');
   end else begin
-//    if command[1].StartsWith('http://')
-//        or command[1].StartsWith('https://')
-//        or command[1].StartsWith('file://')
-//        or command[1].StartsWith('data://')  then
-//      TTMSFNCWebBrowser(FCommandControl).Navigate(command[1])
-//    else
-//      TTMSFNCWebBrowser(FCommandControl).Navigate('https://' + command[1]);
+    if command[1].StartsWith('http://')
+        or command[1].StartsWith('https://')
+        or command[1].StartsWith('file://')
+        or command[1].StartsWith('data://')  then
+      CreateBrowser(command[1])
+    else
+      CreateBrowser('https://' + command[1]);
   end;
 end;
 
@@ -404,10 +404,17 @@ procedure TBufferPanel.CreateBrowser(ARequestedURL: string);
 var
   browser: TBrowserForm;
 begin
+
   FMessagePanel.Visible := false;
   //DisplayError('Browser disabled in this build!');
 
   browser := TBrowserForm.Create(nil);
+  browser.RequestedURL := ARequestedURL;
+  if Assigned(FWindowChild) then
+  begin
+    FWindowChild.Close;
+    FreeAndNil(FWindowChild);
+  end;
   FWindowChild := browser;
 
   browser.Parent := self;

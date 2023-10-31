@@ -46,7 +46,6 @@ type
     procedure CustomWndProc(var aMessage: TMessage);
     procedure SetRequestedURL(AURL: string);
   public
-    constructor Create(AOwner:TComponent; ARequestedURL: string);
     procedure CreateHandle; override;
     procedure DestroyHandle; override;
     procedure NotifyMoveOrResizeStarted;
@@ -73,6 +72,7 @@ begin
     BrowserForms.OwnsObjects := false;
   end;
   BrowserForms.Add(Self);
+  Self.AddressEdt.Text := FRequestedURL;
 end;
 procedure TBrowserForm.FormResize(Sender: TObject);
 begin
@@ -93,11 +93,7 @@ begin
     if GlobalWebView2Loader.Initialized then
       begin
         TempHandle               := FmxHandleToHWND(FMXWindowParent.Handle);
-        if '' <> Self.FRequestedURL then begin
-          WVFMXBrowser1.DefaultUrl := Self.FRequestedURL;
-          AddressEdt.Text := Self.FRequestedURL;
-        end else
-          WVFMXBrowser1.DefaultUrl := AddressEdt.Text;
+        WVFMXBrowser1.DefaultUrl := AddressEdt.Text;
         if not(WVFMXBrowser1.CreateBrowser(TempHandle)) then
           Timer1.Enabled := True;
       end;
@@ -120,10 +116,6 @@ begin
       FMXWindowParent.SetBounds(GetFMXWindowParentRect);
       FMXWindowParent.UpdateSize;
     end;
-end;
-constructor TBrowserForm.Create(AOwner: TComponent; ARequestedURL: string);
-begin
-  Self.FRequestedURL := ARequestedURL;
 end;
 
 procedure TBrowserForm.CreateFMXWindowParent;
@@ -155,9 +147,11 @@ begin
 end;
 procedure TBrowserForm.SetRequestedURL(AURL: string);
 begin
-  Self.FRequestedURL := AURL;
-  if not Timer1.Enabled then
-    WVFMXBrowser1.Navigate(Self.FRequestedURL);
+  FRequestedURL := AURL;
+  if Assigned(Self.AddressEdt) then
+    Self.AddressEdt.Text := AURL;
+  //if not Timer1.Enabled then
+  //  WVFMXBrowser1.Navigate(Self.AddressEdt.Text);
 end;
 
 procedure TBrowserForm.NotifyMoveOrResizeStarted;
@@ -172,16 +166,12 @@ begin
   TempHandle      := FmxHandleToHWND(FMXWindowParent.Handle);
   if not(WVFMXBrowser1.CreateBrowser(TempHandle)) then
     Timer1.Enabled := True;
-  if not Timer1.Enabled then
-    WVFMXBrowser1.Navigate(Self.FRequestedURL);
+  //if not Timer1.Enabled then
+  //  WVFMXBrowser1.Navigate(Self.AddressEdt.Text);
 end;
 procedure TBrowserForm.LoadURL;
 begin
-  if '' <> Self.FRequestedURL then begin
-    WVFMXBrowser1.Navigate(Self.FRequestedURL);
-    AddressEdt.Text := Self.FRequestedURL;
-  end else
-    WVFMXBrowser1.Navigate(AddressEdt.Text);
+  WVFMXBrowser1.Navigate(AddressEdt.Text);
 end;
 procedure TBrowserForm.CreateHandle;
 begin

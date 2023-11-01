@@ -6,6 +6,7 @@ uses
   {system}
   Windows, System.SysUtils, System.Types, System.UITypes, System.Classes,
   System.IOUtils, System.StrUtils, ShellApi, System.Contnrs, System.JSON,
+  System.IniFiles,
 
   {framework}
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
@@ -45,6 +46,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
   private
+    FSystemIniFile: TMemIniFile;
     FFilename: string;
     FGlobalLayoutValues: TStringList;
     FSplitterPanel: TSplitterPanel;
@@ -56,12 +58,14 @@ type
     procedure UpdateWindowCaption;
     procedure StartServer;
     procedure StopServer;
+    procedure OpenFile(AFilename: string);
   public
     { Public declarations }
     procedure ProcessJSONMessage(const AJSON: string);
   published
     property LastSplitterRight: TSplitterPanel read FLastSplitterRight write FLastSplitterRight;
     property LastSplitterLeft: TSplitterPanel read FLastSplitterLeft write FLastSplitterLeft;
+    property SystemIniFile: TMemIniFile read FSystemIniFile;
   end;
 
 var
@@ -87,61 +91,13 @@ end;
 
 procedure TfrmStoneNotes.btnOpenClick(Sender: TObject);
 var
-  serializer: TSerializedSplitter;
-  NewSplitterPanel: TSplitterPanel;
-  data: string;
-  style: string;
-  TmpStyleFile: string;
   compressedStyleArray: TStringDynArray;
+  AFilename: string;
 begin
   if openDlg.Execute then
   begin
-    data := TFile.ReadAllText(openDlg.FileName);
-    FFilename := openDlg.FileName;
-    UpdateWindowCaption;
-    //if Assigned(FSerializer) then
-    //  FSerializer.Free;
-    //FSerializer := TSerializedSplitter.Create.FromString(data);
-    //FSplitterPanel := FSerializer.CreateSplitter(Self, FPluginManager);
-    serializer := TSerializedSplitter.Create.FromString(data);
-    if nil = serializer then
-    begin
-      FFilename := '';
-      ShowMessage('Invalid layout file, file is not valid JSON or is not a layout file: ' + openDlg.FileName);
-      UpdateWindowCaption;
-    end else begin
-      NewSplitterPanel := serializer.CreateSplitter(Self, FPluginManager);
-      if nil = NewSplitterPanel then
-        ShowMessage('Invalid layout file, could not create a splitter from the JSON data: ' + openDlg.FileName)
-      else
-      begin
-        FGlobalLayoutValues := serializer.GlobalLayoutValues;
-        if nil = FGlobalLayoutValues then FGlobalLayoutValues := TStringList.Create;
-        
-        FLastSplitterRight := nil;
-        FLastSplitterLeft := nil;
-        FSplitterPanel.Free;
-        FSplitterPanel := nil;
-        FSplitterPanel := NewSplitterPanel;
-        Self.InsertComponent(FSplitterPanel);
-        FSplitterPanel.Parent := Self;
-        FLastSplitterRight := FSplitterPanel;
-        FLastSplitterLeft := FSplitterPanel;
-        if Assigned(FGlobalLayoutValues) then
-        begin
-          style := FGlobalLayoutValues.Values['Style'];
-          if '' <> style then
-          begin
-            //style := DecompressString(style);
-            TmpStyleFile := 'C:\ProgramData\StoneNotes\Style_'+ExtractFileName(FFilename)+'.style';
-            TFile.WriteAllText(TmpStyleFile, style);
-            TStyleManager.SetStyleFromFile(TmpStyleFile);
-          end;
-        end;
-
-        Resize;
-      end;
-    end;
+    AFilename := openDlg.FileName;
+    OpenFile(AFilename);
   end;
 end;
 
@@ -173,6 +129,8 @@ begin
     data := serializer.ToString;
     TFile.WriteAllText(FFilename, data);
     UpdateWindowCaption;
+    FSystemIniFile.WriteString('files', 'last_opened', FFilename);
+    FSystemIniFile.UpdateFile;
   end else begin
     btnSaveAsClick(btnSaveAs);
   end;
@@ -239,7 +197,18 @@ var
   PluginCount: integer;
   ServerMonitor: TServerMonitor;
   InstallDir: string;
+  SystemIniFilename: string;
+  LastOpenedFilename: string;
+  HomeFilename: string;
 begin
+  {$IFDEF DEBUG}
+  SystemIniFilename := 'C:\ProgramData\StoneNotes\StoneNotes_Debug.ini';
+  {$ELSE}
+  SystemIniFilename := 'C:\ProgramData\StoneNotes\StoneNotes.ini';
+  {$ENDIF}
+  FSystemIniFile := TMemIniFile.Create(SystemIniFilename);
+  FSystemIniFile.AutoSave := true;
+  FSystemIniFile.UpdateFile;
 
   FPluginManager := TPluginManager.Create;
   PluginCount := FPluginManager.LoadPlugins;
@@ -270,6 +239,15 @@ begin
   ServerMonitor := TServerMonitor.Create(True);
   ServerMonitor.Directory := InstallDir + '\Services';
   ServerMonitor.Resume;
+
+  HomeFilename := FSystemIniFile.ReadString('files', 'home', '');
+  LastOpenedFilename := FSystemIniFile.ReadString('files', 'last_opened', '');
+
+  if '' <> HomeFilename then
+    OpenFile(HomeFilename)
+  else if '' <> LastOpenedFilename then
+    OpenFile(LastOpenedFilename);
+
 end;
 
 procedure TfrmStoneNotes.FormDeactivate(Sender: TObject);
@@ -330,6 +308,64 @@ begin
     end;
   finally
     JSONObject.Free;
+  end;
+end;
+
+procedure TfrmStoneNotes.OpenFile(AFilename: string);
+var
+  data: string;
+  serializer: TSerializedSplitter;
+  NewSplitterPanel: TSplitterPanel;
+  style: string;
+  TmpStyleFile: string;
+begin
+  data := TFile.ReadAllText(AFilename);
+  FFilename := AFilename;
+  UpdateWindowCaption;
+  //if Assigned(FSerializer) then
+  //  FSerializer.Free;
+  //FSerializer := TSerializedSplitter.Create.FromString(data);
+  //FSplitterPanel := FSerializer.CreateSplitter(Self, FPluginManager);
+  serializer := TSerializedSplitter.Create.FromString(data);
+  if nil = serializer then
+  begin
+    FFilename := '';
+    ShowMessage('Invalid layout file, file is not valid JSON or is not a layout file: ' + AFilename);
+    UpdateWindowCaption;
+  end
+  else
+  begin
+    NewSplitterPanel := serializer.CreateSplitter(Self, FPluginManager);
+    if nil = NewSplitterPanel then
+      ShowMessage('Invalid layout file, could not create a splitter from the JSON data: ' + AFilename)
+    else
+    begin
+      FGlobalLayoutValues := serializer.GlobalLayoutValues;
+      if nil = FGlobalLayoutValues then
+        FGlobalLayoutValues := TStringList.Create;
+      FLastSplitterRight := nil;
+      FLastSplitterLeft := nil;
+      FSplitterPanel.Free;
+      FSplitterPanel := nil;
+      FSplitterPanel := NewSplitterPanel;
+      Self.InsertComponent(FSplitterPanel);
+      FSplitterPanel.Parent := Self;
+      FLastSplitterRight := FSplitterPanel;
+      FLastSplitterLeft := FSplitterPanel;
+      if Assigned(FGlobalLayoutValues) then
+      begin
+        style := FGlobalLayoutValues.Values['Style'];
+        if '' <> style then
+        begin
+          //style := DecompressString(style);
+          TmpStyleFile := 'C:\ProgramData\StoneNotes\Style_' + ExtractFileName(FFilename) + '.style';
+          TFile.WriteAllText(TmpStyleFile, style);
+          TStyleManager.SetStyleFromFile(TmpStyleFile);
+        end;
+      end;
+      Resize;
+      FSystemIniFile.WriteString('files', 'last_opened', FFilename);
+    end;
   end;
 end;
 

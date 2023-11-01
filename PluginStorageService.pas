@@ -4,134 +4,89 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Rtti, System.JSON,
-  System.NetEncoding, System.StrUtils,
+  System.NetEncoding, System.StrUtils, System.Win.ComObj, ActiveX,
+  ComServ,
 
-  Logger, StringUtils;
+  Logger, StringUtils, StdVcl, StoneNotes_TLB;
 
 type
-  TPluginStorageService = class
+  TPluginStorageService = class(TAutoObject, IPluginStorageService)
   private
     FLayoutValues: TStringList;
-    FForPluginCommand: string;
+    FForPluginCommand: WideString;
   public
-    constructor Create(AForPluginCommand: string);
-    function InterceptRequestURL(URL: string): string;
-    function ExecuteMethod(const AMethodName: string; AParams: TArray<TValue>): string;
-    procedure WriteLayoutValue(AKey: string; AValue: string);
-    function ReadLayoutValue(AKey: string): string;
-    procedure SetAllLayoutValues(AValues: string);
-    function GetAllLayoutValues: string;
-    property ForPluginCommand: string read FForPluginCommand write FForPluginCommand;
+    procedure WriteLayoutValue(const AKey: WideString; const AValue: WideString); safecall;
+    function ReadLayoutValue(const AKey: WideString): WideString; stdcall;
+    procedure SetAllLayoutValues(AValues: WideString); safecall;
+    function GetAllLayoutValues: WideString; safecall;
+    procedure SetForPluginCommand(Value: WideString); safecall;
+    function GetForPluginCommand: WideString; safecall;
+    constructor Create(AForPluginCommand: WideString);
+    class function CreateInstance(AForPluginCommand: string): OleVariant;
+    property ForPluginCommand: WideString read FForPluginCommand write FForPluginCommand;
   end;
 
 implementation
 
-constructor TPluginStorageService.Create(AForPluginCommand: string);
+constructor TPluginStorageService.Create(AForPluginCommand: WideString);
 begin
-  inherited Create;
-  FForPluginCommand := AForPluginCommand;
+  //FForPluginCommand := AForPluginCommand;
   FLayoutValues := TStringList.Create;
 end;
 
-// This function checks the provided URL and if it contains a method call,
-// calls that method then returns the results as a JSON string. If the
-// URL is not a method call to storage-service, then a blank string is
-// returned.
-function TPluginStorageService.InterceptRequestURL(URL: string): string;
-var
-  MethodName: string;
-  Params: TArray<TValue>;
-  ParamsString: string;
-  ParamsArray: TJSONArray;
-  I: Integer;
-  JobId: Integer;
-  StorageServicePrefix: String;
-  JsStringEncodedResult: string;
-  JsLine: string;
-begin
-  Result := '';
-  Log('Plugin resource request: '+URL);
-  // Detect the file://storage-service prefix
-  StorageServicePrefix := 'file://storage-service';
-  if URL.StartsWith(StorageServicePrefix, True) then
-  begin
-    // Parse the URL to extract the method name and parameters
-    var SplitString := URL.Substring(Length(StorageServicePrefix)+1).Split(['/']);  // Remove the prefix and split by '/'
-    if Length(SplitString) > 0 then
-    begin
-      JobId := SplitString[0].ToInteger;
-      MethodName := SplitString[1];
-      if Length(SplitString) <> 3 then
-        Log('Invalid request from plugin, it does not contain 3 segments: '+URL)
-      else begin
-        // URL decode remaining parameter strings (there will only be one unless there are forward slashes in a parameter)
-        for I := 2 to High(SplitString) do
-        begin
-          SplitString[I] := TNetEncoding.URL.Decode(SplitString[I]);
-          //SplitString[I] := ReplaceStr(SplitString[I], '\', '\\');
-        end;
-
-        // Combine all remaining indices to preserve forward slashes in ParamsString
-        ParamsString := String.Join('/', SplitString, 2, Length(SplitString) - 2);
-
-        // Parameters should be a Base64URL (NOT just Base64!) encoded JSON array
-        ParamsArray := TJSONObject.ParseJSONValue(TNetEncoding.Base64URL.Decode(ParamsString)) as TJSONArray;
-        SetLength(Params, ParamsArray.Count);
-        for I := 0 to ParamsArray.Count-1 do
-          Params[I] := TValue.From<string>(ParamsArray.Get(I).Value);
-      end;
-      FlushLogBuffer;
-      Result := ExecuteMethod(MethodName, Params);
-      // Send Result back to JavaScript through the returnResult callback
-      //JsStringEncodedResult := '"'+AddSlashes(Result)+'"';
-      //Log('Sending plugin storage-service response: JobID='+IntToStr(JobId) + ';Result=' + JsStringEncodedResult);
-      //JsLine := Format('PluginStorageService.returnResult(%d, %s)', [JobId, JsStringEncodedResult]);
-      Log(JsLine);
-    end;
-  end;
-end;
-
-function TPluginStorageService.ExecuteMethod(const AMethodName: string; AParams: TArray<TValue>): string;
-var
-  RttiContext: TRttiContext;
-  RttiType: TRttiType;
-  RttiMethod: TRttiMethod;
-begin
-  RttiType := RttiContext.GetType(Self.ClassType);
-  RttiMethod := RttiType.GetMethod(AMethodName);
-  if Assigned(RttiMethod) then
-    Result := RttiMethod.Invoke(Self, AParams).ToString
-  else
-    Result := 'Method not found';
-end;
-
-
 // Called by Javascript to store a value that will be saved in the layout file
-procedure TPluginStorageService.WriteLayoutValue(AKey, AValue: string);
+procedure TPluginStorageService.WriteLayoutValue(const AKey: WideString; const AValue: WideString);
+
 begin
   FLayoutValues.Values[AKey] := AValue;
 
 end;
 
 // Called by Javascript to get a layout value
-function TPluginStorageService.ReadLayoutValue(AKey: string): string;
+function TPluginStorageService.ReadLayoutValue(const AKey: WideString): WideString;
 begin
   Result := FLayoutValues.Values[AKey];
 end;
 
 // Called by serializer to set all the layout values for this plugin
-procedure TPluginStorageService.SetAllLayoutValues(AValues: string);
+procedure TPluginStorageService.SetAllLayoutValues(AValues: WideString);
 begin
   FLayoutValues.Text := AValues;
 end;
 
+procedure TPluginStorageService.SetForPluginCommand(Value: WideString);
+begin
+  FForPluginCommand := Value;
+end;
+
 // Called by serializer to get all layouts values stored by the plugin
-function TPluginStorageService.GetAllLayoutValues: string;
+function TPluginStorageService.GetAllLayoutValues: WideString;
 begin
   if Assigned(FLayoutValues) then
     Result := FLayoutValues.Text;
 end;
 
+
+function TPluginStorageService.GetForPluginCommand: WideString;
+begin
+  Result := FForPluginCommand;
+end;
+
+class function TPluginStorageService.CreateInstance(AForPluginCommand: string): OleVariant;
+var
+  TempVariant : OleVariant;
+begin
+  TempVariant := TPluginStorageService.Create(AForPluginCommand) as IDispatch;
+  Result := TempVariant;
+end;
+
+
+initialization
+  TAutoObjectFactory.Create(
+    ComServer,
+    TPluginStorageService,                      // The class to register
+    CLASS_PluginStorageService,                 // The class GUID (not IFace GUID!)
+    ciMultiInstance, tmApartment);
 
 end.
 

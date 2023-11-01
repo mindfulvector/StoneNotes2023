@@ -9,13 +9,13 @@
     <Transaction>2023/10/14 17:22:05.000.250,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2023/10/14 17:22:15.000.530,=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
     <Transaction>2023/10/14 17:23:46.000.208,D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.BufferPanel.pas=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
-    <Transaction>2023/10/14 17:24:00.000.173,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
     <Transaction>2023/10/14 17:24:00.000.173,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/10/14 17:24:00.000.173,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
     <Transaction>2023/10/14 17:24:03.000.691,D:\Dev\Projects\Embar\Projects\StoneNotes\StoneNotes.dproj=C:\Users\topfr\OneDrive\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>2023/10/14 17:26:42.000.366,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
     <Transaction>2023/10/14 17:27:00.000.221,D:\Dev\Projects\Embar\Projects\StoneNotes\FMX.SplitterPanel.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/10/14 17:27:44.000.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/14 17:27:44.000.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.fmx=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.fmx</Transaction>
+    <Transaction>2023/10/14 17:27:44.000.857,D:\Dev\Projects\Embar\Projects\StoneNotes\MainForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/14 19:58:49.000.825,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/14 19:59:33.000.912,D:\Dev\Projects\Embar\Projects\StoneNotes\SplitterSerializer.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/15 12:06:15.000.557,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
@@ -39,8 +39,8 @@
     <Transaction>2023/10/20 20:55:20.000.523,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/20 20:55:49.000.978,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\WebSocketServer.pas</Transaction>
     <Transaction>2023/10/25 17:15:09.000.671,=D:\Dev\Projects\Embar\Projects\StoneNotes\BrowserForm.pas</Transaction>
-    <Transaction>2023/10/25 17:17:54.000.329,D:\Dev\Projects\Embar\Projects\StoneNotes\BrowserForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\UBrowserForm.pas</Transaction>
     <Transaction>2023/10/25 17:17:54.000.329,D:\Dev\Projects\Embar\Projects\StoneNotes\BrowserForm.fmx=D:\Dev\Projects\Embar\Projects\StoneNotes\UBrowserForm.fmx</Transaction>
+    <Transaction>2023/10/25 17:17:54.000.329,D:\Dev\Projects\Embar\Projects\StoneNotes\BrowserForm.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\UBrowserForm.pas</Transaction>
     <Transaction>2023/10/25 20:11:29.000.302,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/25 20:11:40.000.028,D:\Dev\Projects\Embar\Projects\StoneNotes\ThreadList.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/25 20:21:47.000.190,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
@@ -52,10 +52,18 @@
     <Transaction>2023/10/25 20:35:36.000.766,D:\Dev\Projects\Embar\Projects\StoneNotes\uUnloadAllModules.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/25 20:59:59.000.719,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
     <Transaction>2023/10/25 21:00:46.000.526,D:\Dev\Projects\Embar\Projects\StoneNotes\uProcessCleanup.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
-    <Transaction>2023/10/31 00:11:25.127,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
-    <Transaction>2023/10/31 00:11:38.675,D:\Dev\Projects\Embar\Projects\StoneNotes\uProcessMonitor.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
-    <Transaction>2023/10/31 01:34:35.655,D:\Dev\Projects\Embar\Projects\StoneNotes\uProcessMonitor.pas=</Transaction>
-    <Transaction>2023/10/31 01:34:40.098,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
-    <Transaction>2023/10/31 01:34:44.949,D:\Dev\Projects\Embar\Projects\StoneNotes\uServerMonitor.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/31 00:11:25.000.127,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/31 00:11:38.000.675,D:\Dev\Projects\Embar\Projects\StoneNotes\uProcessMonitor.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/31 01:34:35.000.655,D:\Dev\Projects\Embar\Projects\StoneNotes\uProcessMonitor.pas=</Transaction>
+    <Transaction>2023/10/31 01:34:40.000.098,=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/31 01:34:44.000.949,D:\Dev\Projects\Embar\Projects\StoneNotes\uServerMonitor.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas</Transaction>
+    <Transaction>2023/10/31 23:16:58.385,=D:\Dev\Projects\Embar\Projects\StoneNotes\COM\AddHostObject_TLB.pas</Transaction>
+    <Transaction>2023/10/31 23:16:58.963,=D:\Dev\Projects\Embar\Projects\StoneNotes\COM\uSampleHostObjectClass.pas</Transaction>
+    <Transaction>2023/10/31 23:16:58.995,=D:\Dev\Projects\Embar\Projects\StoneNotes\COM\uSampleObject.pas</Transaction>
+    <Transaction>2023/10/31 23:17:21.440,=D:\Dev\Projects\Embar\Projects\StoneNotes\COM\AddHostObject.ridl</Transaction>
+    <Transaction>2023/10/31 23:17:29.562,D:\Dev\Projects\Embar\Projects\StoneNotes\COM\StoneNotes_TLB.pas=D:\Dev\Projects\Embar\Projects\StoneNotes\COM\AddHostObject_TLB.pas</Transaction>
+    <Transaction>2023/10/31 23:23:26.979,D:\Dev\Projects\Embar\Projects\StoneNotes\COM\StoneNotes.ridl=D:\Dev\Projects\Embar\Projects\StoneNotes\COM\AddHostObject.ridl</Transaction>
+    <Transaction>2023/10/31 23:25:00.141,D:\Dev\Projects\Embar\Projects\StoneNotes\COM\uSampleHostObjectClass.pas=</Transaction>
+    <Transaction>2023/10/31 23:25:00.175,D:\Dev\Projects\Embar\Projects\StoneNotes\COM\uSampleObject.pas=</Transaction>
   </Transactions>
 </BorlandProject>

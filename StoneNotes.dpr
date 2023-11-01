@@ -20,7 +20,10 @@ uses
   uNameDelphiThreads in 'uNameDelphiThreads.pas',
   uUnloadAllModules in 'uUnloadAllModules.pas',
   uProcessCleanup in 'uProcessCleanup.pas',
-  uServerMonitor in 'uServerMonitor.pas';
+  uServerMonitor in 'uServerMonitor.pas',
+  StoneNotes_TLB in 'COM\StoneNotes_TLB.pas';
+
+{$R *.TLB}
 
 {$R *.res}
 

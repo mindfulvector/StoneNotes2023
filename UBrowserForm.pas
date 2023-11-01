@@ -7,7 +7,7 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.StdCtrls, FMX.Edit, FMX.Controls.Presentation, FMX.Layouts,
   uWVLoader, uWVBrowserBase, uWVFMXBrowser, uWVFMXWindowParent, uWVTypeLibrary,
-  uWVTypes;
+  uWVTypes, PluginStorageService, System.Win.ComObj;
 const
   WEBVIEW2_SHOWBROWSER = WM_APP + $101;
 type
@@ -53,8 +53,10 @@ type
     class procedure EnumerateOpenForms;
     property RequestedURL: string read FRequestedURL write SetRequestedURL;
   end;
+
 var
   BrowserForms: TObjectList<TBrowserForm>;
+
 implementation
 {$R *.fmx}
 // This is a simple browser in normal mode in a Firemonkey application.
@@ -170,7 +172,11 @@ begin
   //  WVFMXBrowser1.Navigate(Self.AddressEdt.Text);
 end;
 procedure TBrowserForm.LoadURL;
+var
+  StorageService: OleVariant;
 begin
+  StorageService := TPluginStorageService.CreateInstance('B');
+  WVFMXBrowser1.AddHostObjectToScript('PluginStorageService', StorageService);
   WVFMXBrowser1.Navigate(AddressEdt.Text);
 end;
 procedure TBrowserForm.CreateHandle;

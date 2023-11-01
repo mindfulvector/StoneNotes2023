@@ -164,14 +164,14 @@ var
 begin
   Logger.Log(Format('$$$ server_monitor compiled on %s at %s', [DateToStr(Now), TimeToStr(Now)]));
 
-  DenoPath := FindUtilityFile('Support', 'deno.exe');
+  DenoPath := FindUtilityFile('Support', 'stonenotes_deno.exe');
 
   if DenoPath = '' then
   begin
-    Logger.Log('deno.exe not found');
+    Logger.Log('stonenotes_deno.exe not found');
     Exit;
   end;
-  Logger.Log('deno.exe found at ' + DenoPath);
+  Logger.Log('stonenotes_deno.exe found at ' + DenoPath);
 
   ServerPath := FindUtilityFile('Services', 'server.ts');
   if ServerPath = '' then

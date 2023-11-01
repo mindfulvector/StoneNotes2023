@@ -134,7 +134,7 @@ const server = Deno.serve({ port: 64769 }, async (req: Request, info: ServeHandl
       } else if (ext === "ts" && -1 === fsPath.indexOf('.lib.ts')) {  // Don't allow executing .lib.ts files
         let cmd = [];
         if (ext === "ts") {
-          cmd = ["deno", "run", "--allow-read", "--allow-write", "--allow-net", "--allow-run", fsPath]
+          cmd = ["stonenotes_deno", "run", "--allow-read", "--allow-write", "--allow-net", "--allow-run", fsPath]
         } /*else if(ext === 'php') {
           cmd = ["../Support/php/php", fsPath]
         }*/

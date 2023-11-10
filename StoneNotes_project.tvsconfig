@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<TgConfig Version="3" SubLevelDisabled="False">
+  <Option Name="namespaceFolder.PluginManager" Type="System.String" Value="PluginManager" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.PluginEditor" Type="System.String" Value="PluginEditor" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.PluginStorageService" Type="System.String" Value="PluginStorageService" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.FMX" Type="System.String" Value="FMX" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uProcessCleanup" Type="System.String" Value="uProcessCleanup" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uNameDelphiThreads" Type="System.String" Value="uNameDelphiThreads" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.StoneNotes" Type="System.String" Value="StoneNotes" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uUnloadAllModules" Type="System.String" Value="uUnloadAllModules" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.SplitterSerializer" Type="System.String" Value="SplitterSerializer" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.StringUtils" Type="System.String" Value="StringUtils" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.uServerMonitor" Type="System.String" Value="uServerMonitor" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.StoneNotes_TLB" Type="System.String" Value="StoneNotes_TLB" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.StyleMaker" Type="System.String" Value="StyleMaker" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.UBrowserForm" Type="System.String" Value="UBrowserForm" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.MainForm" Type="System.String" Value="MainForm" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.Logger" Type="System.String" Value="Logger" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.InputQueryDropdown" Type="System.String" Value="InputQueryDropdown" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv" Type="System.String" Value="mv" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.FMX" Type="System.String" Value="mv\FMX" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.Process" Type="System.String" Value="mv\Process" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.StringUtils" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.InputQueryDropdown" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.SplitterPanel" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.WebView" Type="System.String" Value="mv\WebView" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.MainForm" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.Logger" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.SplitterSerializer" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.PluginEditor" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.BufferPanel" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.PluginManager" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.mv.PluginStorageService" Type="System.String" Value="" Category="General" IsBrowsable="False" />
+</TgConfig>

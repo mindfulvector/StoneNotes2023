@@ -1,0 +1,26 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{41518398-3D3F-4498-82C2-932B35B72773}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="ModelSupport_Design\default.txaPackage"/>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Design.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Design.Personality>
+                <Options>
+                    <OptionsSet>
+                        <Together>
+                            <Together Name="UMLVersion">2.0</Together>
+                        </Together>
+                    </OptionsSet>
+                </Options>
+            </Design.Personality>
+            <Deployment Version="4"/>
+            <ModelSupport>True</ModelSupport>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+</Project>

@@ -72,6 +72,7 @@ procedure TServerThread.HandleExecute(AContext: TIdContext);
 var
   io: TWebSocketIOHandlerHelper;
   msg: string;
+  Response: string;
 begin
   io := TWebSocketIOHandlerHelper(AContext.Connection.IOHandler);
   io.CheckForDataOnSource(10);
@@ -89,11 +90,11 @@ begin
   TThread.Queue(nil,
     procedure
     begin
-      frmStoneNotes.ProcessJSONMessage(msg);
+      Response := frmStoneNotes.ProcessJSONMessage(msg);
     end
   );
 
-  io.WriteString(msg);
+  io.WriteString(Response);
 end;
 
 procedure TServerThread.Execute;

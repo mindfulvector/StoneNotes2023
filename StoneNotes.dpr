@@ -14,8 +14,6 @@ uses
   StyleMaker in 'StyleMaker.pas',
   InputQueryDropdown in 'InputQueryDropdown.pas',
   PluginEditor in 'PluginEditor.pas',
-  ServerThread in 'ServerThread.pas',
-  WebSocketServer in 'WebSocketServer.pas',
   UBrowserForm in 'UBrowserForm.pas' {BrowserForm},
   uNameDelphiThreads in 'uNameDelphiThreads.pas',
   uUnloadAllModules in 'uUnloadAllModules.pas',

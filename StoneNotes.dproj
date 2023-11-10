@@ -281,8 +281,6 @@
         <DCCReference Include="StyleMaker.pas"/>
         <DCCReference Include="InputQueryDropdown.pas"/>
         <DCCReference Include="PluginEditor.pas"/>
-        <DCCReference Include="ServerThread.pas"/>
-        <DCCReference Include="WebSocketServer.pas"/>
         <DCCReference Include="UBrowserForm.pas">
             <Form>BrowserForm</Form>
             <FormType>fmx</FormType>
@@ -293,6 +291,7 @@
         <DCCReference Include="uServerMonitor.pas"/>
         <DCCReference Include="COM\StoneNotes_TLB.pas"/>
         <RidlCompile Include="COM\StoneNotes.ridl"/>
+        <RidlCompile Include="StoneNotes.ridl"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -331,6 +330,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="COM\StoneNotes.ridl" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="StoneNotes.ridl" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -1187,6 +1192,9 @@
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">True</Platform>
             </Platforms>
+            <ActiveXProjectInfo>
+                <version>1</version>
+            </ActiveXProjectInfo>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

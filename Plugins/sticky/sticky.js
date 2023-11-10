@@ -1,6 +1,8 @@
 $(document).ready(function(){
+    const pluginStorage = PluginStorageService();
+
     // Load notes from localStorage or a default set
-    PluginStorageService.readLayoutValue('CorkNotes', (notesJson) => {
+    pluginStorage.ReadLayoutValue('CorkNotes', (notesJson) => {
         console.log('loading notes callback, reply:' + notesJson);
         var notes = [
             { x: '10px', y: '40px', width: '150px', height: '80px', text: "This is the corkboard sticky notes plugin!"},
@@ -169,7 +171,7 @@ function saveNotes() {
         };
     }).get();
     console.log('CorkNotes to save: '+JSON.stringify(savedNotes));
-    PluginStorageService.writeLayoutValue('CorkNotes', JSON.stringify(savedNotes));
+    pluginStorage.WriteLayoutValue('CorkNotes', JSON.stringify(savedNotes));
     localStorage.setItem('CorkNotes', JSON.stringify(savedNotes));
 }
 

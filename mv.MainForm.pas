@@ -62,8 +62,8 @@ type
     FPluginManager: TPluginManager;
     FWndProcId: TFmxHandle;
     procedure UpdateWindowCaption;
-    procedure StartServer;
-    procedure StopServer;
+//    procedure StartServer;
+//    procedure StopServer;
     procedure OpenFile(AFilename: string);
   public
     { Public declarations }
@@ -165,7 +165,7 @@ procedure TfrmStoneNotes.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   mv.Logger.Log('Main form closing');
   TBrowserForm.EnumerateOpenForms;
-  StopServer;
+  //StopServer;
   FlushLogBuffer;
   Application.Terminate;
   Application.ProcessMessages;
@@ -233,7 +233,7 @@ begin
   FLastSplitterLeft := FSplitterPanel;
   Resize;
 
-  StartServer;
+  //StartServer;
 
   InstallDir := ExtractFileDir(ParamStr(0));
   if not FileExists(InstallDir+'\Services\server.ts') then

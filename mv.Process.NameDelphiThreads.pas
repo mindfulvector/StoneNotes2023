@@ -3,7 +3,7 @@ unit mv.Process.NameDelphiThreads;
 interface
 uses
   WinAPI.Windows,
-  Logger;
+  mv.Logger;
 
 procedure NameDelphiThreads(const pMainThreadId:THandle);
 //procedure KillDelphiThreads(const pMainThreadId:THandle);

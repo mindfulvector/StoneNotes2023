@@ -11,7 +11,7 @@ procedure UnloadAllModules;
 implementation
 
 uses
-  Logger;
+  mv.Logger;
 
 procedure UnloadAllModules;
 var
@@ -28,7 +28,7 @@ begin
     repeat
       if 'WebView2Loader.dll' = ModuleEntry.szModule then
       begin
-        Logger.Log('Unload module ' + ModuleEntry.szModule);
+        mv.Logger.Log('Unload module ' + ModuleEntry.szModule);
         FreeLibrary(ModuleEntry.hModule);
       end;
     until not Module32Next(hSnapShot, ModuleEntry);

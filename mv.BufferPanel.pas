@@ -29,20 +29,21 @@ type
     FPluginStorageService: TPluginStorageService;
     FMessagePanel: TPanel;
     FMessageMemo: TMemo;
+    FWebPort: integer;
     procedure GoButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     function CreateBrowser(ARequestedURL: string): TBrowserForm;
     procedure BufferCommandMemo(command: TArray<System.string>);
     procedure BufferCommandBrowser(command: TArray<System.string>);
-    procedure ScanForPluginCmd(command: TArray<System.string>);
+    procedure ScanForPluginCmd(command: TArray<System.string>; WebPort: integer);
     procedure DisplayError(AMessage: String);
     procedure BufferCommandPluginEditor(command: TArray<System.string>);
     procedure BufferCommandQuit(command: TArray<System.string>);
   protected
     procedure Resize; override;
   public
-    constructor Create(AOwner: TComponent; APluginManager: TPluginManager);
+    constructor Create(AOwner: TComponent; APluginManager: TPluginManager; AWebPort: integer);
     destructor Destroy; override;
 
     function BufferID: integer;
@@ -80,9 +81,10 @@ end;
 
 { TBufferPanel }
 
-constructor TBufferPanel.Create(AOwner: TComponent; APluginManager: TPluginManager);
+constructor TBufferPanel.Create(AOwner: TComponent; APluginManager: TPluginManager; AWebPort: integer);
 begin
   inherited Create(AOwner);
+  FWebPort := AWebPort;
   FPluginManager := APluginManager;
 
   Inc(LastBufferID);
@@ -223,7 +225,7 @@ end;
 // expect to always recieve a valid command matching their format, this one
 // scans for plugin commands and MAY load a plugin into the buffer if one
 // is found that matches the command array.
-procedure TBufferPanel.ScanForPluginCmd(command: TArray<System.string>);
+procedure TBufferPanel.ScanForPluginCmd(command: TArray<System.string>; WebPort: integer);
 var
   Plugin: TPlugin;
   PluginPage: string;
@@ -239,7 +241,7 @@ begin
     begin
       if Plugin.HasPluginPageForCommand(command) then
       begin
-        Plugin.LoadPluginPageForCommand(command, CreateBrowser('about:blank'));
+        Plugin.LoadPluginPageForCommand(command, CreateBrowser('about:blank'), WebPort);
       end else begin
         DisplayError('Error: Command is registered to plugin '
                       +'"'+Plugin.DirName+'", '
@@ -435,7 +437,7 @@ begin
     if command[0] = 'EPLG' then BufferCommandPluginEditor(command);
 
     // Scan for plugin commands
-    if nil = FCommandControl then ScanForPluginCmd(command);
+    if nil = FCommandControl then ScanForPluginCmd(command, FWebPort);
 
     // Invalid command, bummer!
     if (nil = FCommandControl) and (nil = FWindowChild) and not FMessagePanel.Visible then DisplayError('Error: Unknown command.');

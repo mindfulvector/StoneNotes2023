@@ -53,7 +53,7 @@ type
     procedure DestroyHandle; override;
     procedure NotifyMoveOrResizeStarted;
     procedure SetBounds(ALeft: Integer; ATop: Integer; AWidth: Integer; AHeight: Integer); override;
-    class procedure EnumerateOpenForms;
+    class procedure FreeAllOpenForms;
     property RequestedURL: string read FRequestedURL write SetRequestedURL;
 //    procedure AddService(AServiceName: string; AService: OleVariant);
   end;
@@ -203,7 +203,7 @@ begin
   FreeObjectInstance(FFormStub);
   inherited DestroyHandle;
 end;
-class procedure TBrowserForm.EnumerateOpenForms;
+class procedure TBrowserForm.FreeAllOpenForms;
 var
   I: integer;
 begin

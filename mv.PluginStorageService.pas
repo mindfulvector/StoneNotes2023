@@ -12,68 +12,61 @@ type
   TPluginStorageService = class(TPluginService)
   private
     FLayoutValues: TStringList;
-    FForPluginCommand: WideString;
+    FForPluginCommand: string;
   public
-    procedure WriteLayoutValue(const AKey: WideString; const AValue: WideString); safecall;
-    function ReadLayoutValue(const AKey: WideString): WideString; stdcall;
-    procedure SetAllLayoutValues(AValues: WideString); safecall;
-    function GetAllLayoutValues: WideString; safecall;
-    procedure SetForPluginCommand(Value: WideString); safecall;
-    function GetForPluginCommand: WideString; safecall;
-    constructor Create(AForPluginCommand: WideString);
-    property ForPluginCommand: WideString read FForPluginCommand write FForPluginCommand;
+    constructor Create(AForPluginCommand: string);
+    procedure WriteLayoutValue(const AKey: string; const AValue: string);
+    function ReadLayoutValue(const AKey, ADefault: string): string;
+    procedure SetAllLayoutValues(AValues: string);
+    function GetAllLayoutValues: string;
+    procedure SetForPluginCommand(Value: string);
+    function GetForPluginCommand: string;
+    property ForPluginCommand: string read FForPluginCommand write FForPluginCommand;
   end;
 
 implementation
 
-var
-  PluginStorageInstances: TStringList;
-
-constructor TPluginStorageService.Create(AForPluginCommand: WideString);
+constructor TPluginStorageService.Create(AForPluginCommand: string);
 begin
-  if not Assigned(PluginStorageInstances) then
-    PluginStorageInstances := TStringList.Create;
-
   FForPluginCommand := AForPluginCommand;
   FLayoutValues := TStringList.Create;
-
-  PluginStorageInstances.AddObject(FForPluginCommand, Self);
 end;
 
 // Called by Javascript to store a value that will be saved in the layout file
-procedure TPluginStorageService.WriteLayoutValue(const AKey: WideString; const AValue: WideString);
-
+procedure TPluginStorageService.WriteLayoutValue(const AKey, AValue: string);
 begin
   FLayoutValues.Values[AKey] := AValue;
-
 end;
 
 // Called by Javascript to get a layout value
-function TPluginStorageService.ReadLayoutValue(const AKey: WideString): WideString;
+function TPluginStorageService.ReadLayoutValue(const AKey, ADefault: string): string;
 begin
-  Result := FLayoutValues.Values[AKey];
+  if FLayoutValues.IndexOfName(AKey) > -1 then
+    Result := FLayoutValues.Values[AKey]
+  else
+    Result := ADefault;
 end;
 
 // Called by serializer to set all the layout values for this plugin
-procedure TPluginStorageService.SetAllLayoutValues(AValues: WideString);
+procedure TPluginStorageService.SetAllLayoutValues(AValues: string);
 begin
   FLayoutValues.Text := AValues;
 end;
 
-procedure TPluginStorageService.SetForPluginCommand(Value: WideString);
+procedure TPluginStorageService.SetForPluginCommand(Value: string);
 begin
   FForPluginCommand := Value;
 end;
 
 // Called by serializer to get all layouts values stored by the plugin
-function TPluginStorageService.GetAllLayoutValues: WideString;
+function TPluginStorageService.GetAllLayoutValues: string;
 begin
   if Assigned(FLayoutValues) then
     Result := FLayoutValues.Text;
 end;
 
 
-function TPluginStorageService.GetForPluginCommand: WideString;
+function TPluginStorageService.GetForPluginCommand: string;
 begin
   Result := FForPluginCommand;
 end;

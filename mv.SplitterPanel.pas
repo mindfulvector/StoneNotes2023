@@ -19,9 +19,10 @@ type
     FSplitterPosition: Integer;
     IsCaptured: Boolean;
     FPluginManager: TPluginManager;
+    FWebPort: integer;
     function CalcSplitterPositionPixels: Single;
   public
-    constructor Create(AOwner: TComponent; APluginManager: TPluginManager);
+    constructor Create(AOwner: TComponent; APluginManager: TPluginManager; AWebPort: integer);
     procedure Paint; override;
     procedure Resize; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -45,12 +46,13 @@ implementation
 uses
   mv.MainForm;
 
-constructor TSplitterPanel.Create(AOwner: TComponent; APluginManager: TPluginManager);
+constructor TSplitterPanel.Create(AOwner: TComponent; APluginManager: TPluginManager; AWebPort: integer);
 begin
   inherited Create(AOwner);
   FPluginManager := APluginManager;
   FSplitterPosition := 50;
   FSplitDirection := sdVertical; // Default direction
+  FWebPort := AWebPort;
 end;
 
 procedure TSplitterPanel.ForceResize;
@@ -91,7 +93,7 @@ begin
 
     if not Assigned(FLeftControl) then
     begin
-      FLeftControl := TBufferPanel.Create(Self, FPluginManager);
+      FLeftControl := TBufferPanel.Create(Self, FPluginManager, FWebPort);
     end;
 
     Self.InsertComponent(FLeftControl);
@@ -109,7 +111,7 @@ begin
 
     if not Assigned(FRightControl) then
     begin
-      FRightControl := TBufferPanel.Create(Self, FPluginManager);
+      FRightControl := TBufferPanel.Create(Self, FPluginManager, FWebPort);
     end;
 
     Self.InsertComponent(FRightControl);
@@ -266,7 +268,7 @@ function TSplitterPanel.SplitSide(ASide: TSide): TSplitterPanel;
 var
   NewSplitterPanel: TSplitterPanel;
 begin
-  NewSplitterPanel := TSplitterPanel.Create(Self, FPluginManager);
+  NewSplitterPanel := TSplitterPanel.Create(Self, FPluginManager, FWebPort);
   if Self.SplitDirection = TSplitDirection.sdVertical then
   begin
     NewSplitterPanel.SetSplitDirection(TSplitDirection.sdHorizontal);

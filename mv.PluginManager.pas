@@ -17,6 +17,7 @@ type
     FDirName: string;
     FServices: TStringList;
     FActivePluginManager: TPluginManager;
+    FServiceContext: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -32,13 +33,16 @@ type
     //procedure AttachService(AServiceName: string; AService: TPluginService);
 
     function HasPluginPageForCommand(ACommand: TArray<System.string>): Boolean;
-    function LoadPluginPageForCommand(ACommand: TArray<System.string>; ABrowserForm: TBrowserForm): Boolean;
+    function LoadPluginPageForCommand(ACommand: TArray<System.string>; ABrowserForm: TBrowserForm; WebPort: integer): Boolean;
 
     property ActivePluginManager: TPluginManager read FActivePluginManager write FActivePluginManager;
+    property ServiceContext: string read FServiceContext write FServiceContext;
+    function GetService(const ClassName: string): TPluginService;
   end;
 
   TPluginManager = class
   private
+    FPluginsDirectory: string;
     FPlugins: TObjectList<TPlugin>;
     FActiveLayoutFilename: string;
     function GetPlugin(Index: Integer): TPlugin;
@@ -47,6 +51,8 @@ type
     destructor Destroy; override;
 
     function LoadPlugins: integer;
+    property PluginsDirectory: string read FPluginsDirectory;
+    function PluginCount: integer;
     property Plugins[Index: Integer]: TPlugin read GetPlugin; default;
 
     function FindPluginByCommandWord(ACommand: String): TPlugin;
@@ -127,7 +133,7 @@ begin
   Result := '' <> Settings.Values['plugin/command_' + ACommand[0]];
 end;
 
-function TPlugin.LoadPluginPageForCommand(ACommand: TArray<System.string>; ABrowserForm: TBrowserForm): Boolean;
+function TPlugin.LoadPluginPageForCommand(ACommand: TArray<System.string>; ABrowserForm: TBrowserForm; WebPort: integer): Boolean;
 var
   PluginPage: string;
   PluginPageHTML: string;
@@ -139,6 +145,7 @@ var
   ServiceName: string;
 begin
   PluginPage := Settings.Values['plugin/command_' + ACommand[0]];
+  (*
   PluginPageHTML := Self.ReadFile(PluginPage);
 
   // Inject StorageService JS function
@@ -162,21 +169,22 @@ begin
 
   // Store next to the original plugin file with a prefix to the filename
   Self.WriteFile('eval_' + PluginPage, PluginPageHTML);
+  *)
 
   // Setup URL to the prepared HTML file via the Deno service.
-  FileURL := 'http://127.0.0.1:64769/'
+  FileURL := 'http://127.0.0.1:' + IntToStr(WebPort) + '/plugin/'
                       +Self.DirName
-                      +'\eval_'
+                      +'/'
                       +PluginPage
-                      +'?LayFile='
-                      +FActivePluginManager.ActiveLayoutFilename;
+                      +'?C='
+                      +String.Join(';',ACommand);
 
   // Initialize services if they haven't already been loaded (this function can
   // be called for the same plugin many times to re/load it).
-//  if -1 = FServices.IndexOf('TPluginStorageService') then
-//  begin
-//    FServices.AddObject('TPluginStorageService', TPluginStorageService.Create(JoinString(ACommand)));
-//  end;
+  if -1 = FServices.IndexOf('TPluginStorageService') then
+  begin
+    FServices.AddObject('TPluginStorageService', TPluginStorageService.Create(JoinString(ACommand)));
+  end;
 //
 //  // Attach services
 //  for oService in FServices.ToObjectArray do
@@ -198,6 +206,16 @@ end;
 function TPlugin.GetFilePath(AFilename: string): string;
 begin
   Result := FDirectory + '\' + AFilename;
+end;
+
+function TPlugin.GetService(const ClassName: string): TPluginService;
+var
+  I: integer;
+begin
+  Result := nil;
+  I := FServices.IndexOf(ClassName);
+  if I > -1 then
+    Result := FServices.Objects[I] as TPluginService;
 end;
 
 procedure TPlugin.WriteFile(AFilename: string; AValue: string);
@@ -231,9 +249,12 @@ var
   Pattern: string;
 begin
   Count := 0;
-  Pattern := 'Plugins\*';
-  if DirectoryExists('..\Plugins') then Pattern := '..\Plugins\*';
-  if DirectoryExists('..\..\Plugins') then Pattern := '..\..\Plugins\*';
+  FPluginsDirectory := 'Plugins';
+  if DirectoryExists('..\Plugins') then FPluginsDirectory := '..\Plugins';
+  if DirectoryExists('..\..\Plugins') then FPluginsDirectory := '..\..\Plugins';
+
+  Pattern := FPluginsDirectory + '\*';
+
   if FindFirst(Pattern, faDirectory, Rec) = 0 then
   begin
     repeat
@@ -256,6 +277,11 @@ begin
     FindClose(Rec);
   end;
   Result := Count;
+end;
+
+function TPluginManager.PluginCount: integer;
+begin
+  Result := FPlugins.Count;
 end;
 
 function TPluginManager.FindPluginByCommandWord(ACommand: String): TPlugin;

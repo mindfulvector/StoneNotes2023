@@ -21,7 +21,7 @@ type
 
     function ToString: string;
     function FromString(const AJSONStr: string): TSerializedSplitter;
-    function CreateSplitter(AOwner: TFMXObject; APluginManager: TPluginManager): TSplitterPanel;
+    function CreateSplitter(AOwner: TFMXObject; APluginManager: TPluginManager; AWebPort: integer): TSplitterPanel;
     property GlobalLayoutValues: TStringList read FGlobalLayoutValues write FGlobalLayoutValues;
   end;
 
@@ -176,21 +176,21 @@ begin
   Result := Self;
 end;
 
-function TSerializedSplitter.CreateSplitter(AOwner: TFMXObject; APluginManager: TPluginManager): TSplitterPanel;
+function TSerializedSplitter.CreateSplitter(AOwner: TFMXObject; APluginManager: TPluginManager; AWebPort: integer): TSplitterPanel;
 var
   buffer: TBufferPanel;
 begin
-  Result := TSplitterPanel.Create(AOwner, APluginManager); // Parent can be set later when adding to another control
+  Result := TSplitterPanel.Create(AOwner, APluginManager, AWebPort); // Parent can be set later when adding to another control
   Result.Parent := AOwner;
   Result.SplitDirection := SplitDirection;
   Result.SplitterPosition := SplitterPosition;
 
   // Create Left Child
   if LeftControl is TSerializedSplitter then
-    Result.SetLeftControl(TSerializedSplitter(LeftControl).CreateSplitter(Result, APluginManager))
+    Result.SetLeftControl(TSerializedSplitter(LeftControl).CreateSplitter(Result, APluginManager, AWebPort))
   else if LeftControl is TSerializedBuffer then
   begin
-    buffer := TBufferPanel.Create(Result, APluginManager);
+    buffer := TBufferPanel.Create(Result, APluginManager, AWebPort);
     Result.SetLeftControl(buffer);
     buffer.SetBufferID(TSerializedBuffer(LeftControl).BufferID);
     buffer.SetCommand(TSerializedBuffer(LeftControl).CommandType);
@@ -199,10 +199,10 @@ begin
 
   // Create Right Child
   if RightControl is TSerializedSplitter then
-    Result.SetRightControl(TSerializedSplitter(RightControl).CreateSplitter(Result, APluginManager))
+    Result.SetRightControl(TSerializedSplitter(RightControl).CreateSplitter(Result, APluginManager, AWebPort))
   else if RightControl is TSerializedBuffer then
   begin
-    buffer := TBufferPanel.Create(Result, APluginManager);
+    buffer := TBufferPanel.Create(Result, APluginManager, AWebPort);
     Result.SetRightControl(buffer);
     buffer.SetBufferID(TSerializedBuffer(RightControl).BufferID);
     buffer.SetCommand(TSerializedBuffer(RightControl).CommandType);

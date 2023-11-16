@@ -19,7 +19,10 @@ uses
   mv.SplitterPanel in 'mv.SplitterPanel.pas',
   mv.SplitterSerializer in 'mv.SplitterSerializer.pas',
   mv.StringUtils in 'mv.StringUtils.pas',
-  mv.WebView.BrowserForm in 'mv.WebView.BrowserForm.pas' {BrowserForm};
+  mv.WebView.BrowserForm in 'mv.WebView.BrowserForm.pas' {BrowserForm},
+  mv.WebService in 'mv.WebService.pas',
+  mv.WebService.HomeController in 'mv.WebService.HomeController.pas',
+  mv.WebService.PluginController in 'mv.WebService.PluginController.pas';
 
 {$R *.res}
 

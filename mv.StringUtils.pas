@@ -9,8 +9,9 @@ uses
 function SplitString(const AInput: string): TStringDynArray;
 function JoinString(const Arr: TStringDynArray): string;
 function EscapeString(const s: string): string;
-function StandardizeLineEndings(const S: string): string;
+function ExtractField(const Source, Delimiter: string; Index: Integer): string;
 function AddSlashes(AString: string): string;
+function StandardizeLineEndings(const S: string): string;
 
 function CompressString(const AString: string): string;
 function DecompressString(AString: string): string;
@@ -124,6 +125,33 @@ begin
     if s[i] in ['\', '"'] then
       Result := Result + '\';  // Add a backslash before the character
     Result := Result + s[i];
+  end;
+end;
+
+function ExtractField(const Source, Delimiter: string; Index: Integer): string;
+var
+  PosStart, PosEnd: Integer;
+  CurrentIndex: Integer;
+begin
+  Result := '';
+  if Index < 1 then Exit;
+
+  PosStart := 1;
+  CurrentIndex := 1;
+
+  while CurrentIndex <= Index do
+  begin
+    PosEnd := PosEx(Delimiter, Source, PosStart);
+    if PosEnd = 0 then PosEnd := Length(Source) + 1;
+
+    if CurrentIndex = Index then
+    begin
+      Result := Copy(Source, PosStart, PosEnd - PosStart);
+      Break;
+    end;
+
+    Inc(CurrentIndex);
+    PosStart := PosEnd + Length(Delimiter);
   end;
 end;
 

@@ -3,7 +3,7 @@ object frmStoneNotes: TfrmStoneNotes
   Top = 0
   Caption = 'StoneNotes Matrix'
   ClientHeight = 480
-  ClientWidth = 641
+  ClientWidth = 640
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -93,7 +93,6 @@ object frmStoneNotes: TfrmStoneNotes
     OnClick = btnStyleClick
   end
   object HttpPluginServices: TIdHTTPServer
-    Active = True
     Bindings = <
       item
         IP = '127.0.0.1'

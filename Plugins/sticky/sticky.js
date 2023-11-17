@@ -1,6 +1,7 @@
-$(document).ready(function(){
-    const pluginStorage = PluginStorageService();
+const pluginStorage = PluginStorageService();
 
+$(document).ready(function(){
+    
     // Load notes from localStorage or a default set
     pluginStorage.ReadLayoutValue('CorkNotes', (notesJson) => {
         console.log('loading notes callback, reply:' + notesJson);

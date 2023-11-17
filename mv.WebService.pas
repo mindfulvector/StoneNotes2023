@@ -14,7 +14,7 @@ type
   end;
 
 function ParseRoutePattern(const Pattern: string): TRouteInfo;
-function WebRoute(const HttpMethod, Path, Query, RoutePattern: string): string;
+function WebRoute(const HttpMethod, Path, Query, PostBody, RoutePattern: string): string;
 
 implementation
 
@@ -50,7 +50,7 @@ end;
 /// section of mv.WebService on startup. The result from this action method is
 /// returned as a string.
 /// </summary>
-function WebRoute(const HttpMethod, Path, Query, RoutePattern: string): string;
+function WebRoute(const HttpMethod, Path, Query, PostBody, RoutePattern: string): string;
 var
   RouteInfo: TRouteInfo;
   Context: TRttiContext;
@@ -82,7 +82,10 @@ begin
       raise Exception.Create('WebRoute error: action method `'+RouteInfo.ControllerClass+'.'+RouteInfo.ActionMethod+'` not found');
 
     // Invoke the action method and return the result as a string
-    Result := Method.Invoke(Instance, [HttpMethod, Path, Query]).AsString;
+    if ('POST' = HttpMethod) then
+      Result := Method.Invoke(Instance, [HttpMethod, Path, Query, PostBody]).AsString
+    else
+      Result := Method.Invoke(Instance, [HttpMethod, Path, Query]).AsString;
 
   finally
     Context.Free;

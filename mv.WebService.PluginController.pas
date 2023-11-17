@@ -8,6 +8,7 @@ type
     function PluginResource(const HttpMethod, Path, Query: string): string;
     function AssetResource(const HttpMethod, Path, Query: string): string;
     function ReadLayoutValue(const HttpMethod, Path, Query: string): string;
+    function WriteLayoutValue(const HttpMethod, Path, Query, PostBody: string): string;
   end;
 implementation
 
@@ -112,6 +113,48 @@ begin
   end;
 end;
 
+function TPluginController.WriteLayoutValue(const HttpMethod, Path, Query, PostBody: string): string;
+var
+  PluginManager: TPluginManager;
+  ResourceName: string;
+  Params: TStringList;
+  AContext: string;
+  AKey: string;
+  AValue: string;
+  Plugin: TPlugin;
+  I: integer;
+  StorageService: TPluginStorageService;
+begin
+  Result := '';
+  PluginManager := frmStoneNotes.PluginManager;
+  Params := TStringList.Create('"', '&');
+  Params.StrictDelimiter := true;
+  try
+    Params.DelimitedText := PostBody + '&' + Query;
+    AContext := Params.Values['AContext'].Replace('%2F', '/').Replace('%3D', '=');
+    AKey := Params.Values['AKey'];
+    AValue := Params.Values['AValue'];
+
+    // Look for a plugin with that ServiceContext
+    for I := 0 to PluginManager.PluginCount-1 do
+    begin
+      Plugin := PluginManager.Plugins[I];
+
+      if not SameText(Plugin.ServiceContext, AContext) then
+        Continue;
+
+      // Use the service instance on this plugin instance to perform the action
+      StorageService := Plugin.GetService('TPluginStorageService') as TPluginStorageService;
+      if Assigned(StorageService) then
+        StorageService.WriteLayoutValue(AKey, AValue);
+
+      Result := StorageService.ReadLayoutValue(AKey, '');
+
+    end;
+  finally
+    Params.Free;
+  end;
+end;
 
 end.
 

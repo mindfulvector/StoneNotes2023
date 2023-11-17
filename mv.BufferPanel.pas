@@ -26,10 +26,11 @@ type
     FBufferIdLabel: TLabel;
     FBufferID: integer;
     FPluginManager: TPluginManager;
-    FPluginStorageService: TPluginStorageService;
+    //FPluginStorageService: TPluginStorageService;
     FMessagePanel: TPanel;
     FMessageMemo: TMemo;
     FWebPort: integer;
+    FPlugin: TPlugin;
     procedure GoButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure CommandEditKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
@@ -56,6 +57,7 @@ type
     procedure SetProperties(SProperties: string);
 
     procedure ForceResize; override;
+    property Plugin: TPlugin read FPlugin;
   end;
 
   procedure TriggerGoButton(BufferID: integer);
@@ -199,25 +201,33 @@ end;
 // Properties is a string defined by the buffer command for storing
 // key values needed to reload state.
 function TBufferPanel.Properties: string;
+var
+  PluginStorageService: TPluginStorageService;
 begin
   if FCommandControl is TMemo then
     Properties := TMemo(FCommandControl).Text;
 
-  if Assigned(FPluginStorageService) then
-    Properties := FPluginStorageService.GetAllLayoutValues;
+  if Assigned(FPlugin) then
+  begin
+    PluginStorageService := FPlugin.GetService('TPluginStorageService') as TPluginStorageService;
+    Properties := PluginStorageService.GetAllLayoutValues;
+  end;
 end;
 
 // Restore properties to the buffer command component.
 procedure TBufferPanel.SetProperties(SProperties: string);
+var
+  PluginStorageService: TPluginStorageService;
 begin
   if FCommandControl is TMemo then
   begin
     TMemo(FCommandControl).Text := SProperties;
   end;
 
-  if Assigned(FPluginStorageService) then
+  if Assigned(FPlugin) then
   begin
-    FPluginStorageService.SetAllLayoutValues(SProperties)
+    PluginStorageService := FPlugin.GetService('TPluginStorageService') as TPluginStorageService;
+    PluginStorageService.SetAllLayoutValues(SProperties);
   end;
 end;
 
@@ -241,6 +251,7 @@ begin
     begin
       if Plugin.HasPluginPageForCommand(command) then
       begin
+        FPlugin := Plugin;
         Plugin.LoadPluginPageForCommand(command, CreateBrowser('about:blank'), WebPort);
       end else begin
         DisplayError('Error: Command is registered to plugin '
@@ -428,8 +439,9 @@ begin
 
     mv.Logger.Log(FCommandEdit.Text);
 
-    // Spawn command controls from command entry...
+    FPlugin := nil;
 
+    // Spawn command controls from command entry...
     // Check built-in commands first
     if command[0] = ':Q' then begin BufferCommandQuit(command); Exit; end;
     if command[0] = 'M' then BufferCommandMemo(command);

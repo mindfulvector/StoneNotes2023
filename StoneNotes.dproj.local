@@ -18,8 +18,8 @@
     <Transaction>2023/11/13 20:57:17.000.234,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.Logger.pas</Transaction>
     <Transaction>2023/11/13 20:57:17.000.957,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.MainForm.pas</Transaction>
     <Transaction>2023/11/13 20:57:18.000.778,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.SplitterSerializer.pas</Transaction>
-    <Transaction>2023/11/13 20:57:18.000.137,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.PluginManager.pas</Transaction>
     <Transaction>2023/11/13 20:57:18.000.447,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.Process.ProcessCleanup.pas</Transaction>
+    <Transaction>2023/11/13 20:57:18.000.137,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.PluginManager.pas</Transaction>
     <Transaction>2023/11/13 20:57:18.000.670,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.Process.UnloadAllModules.pas</Transaction>
     <Transaction>2023/11/13 20:57:18.000.739,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.SplitterPanel.pas</Transaction>
     <Transaction>2023/11/13 20:57:18.000.276,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.PluginStorageService.pas</Transaction>
@@ -30,13 +30,14 @@
     <Transaction>2023/11/13 20:57:18.000.876,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.StringUtils.pas</Transaction>
     <Transaction>2023/11/13 20:57:19.000.016,=D:\Dev\Projects\Embar\Projects\StoneNotes\mv.WebView.BrowserForm.pas</Transaction>
     <Transaction>2023/11/13 20:57:22.000.806,D:\Dev\Projects\Embar\Projects\StoneNotes\Unit1.pas=</Transaction>
-    <Transaction>2023/11/15 15:14:52.514,=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/11/15 15:15:00.916,D:\Delphi\StoneNotes\mv.WebService.pas=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/11/15 15:44:03.171,=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/11/15 15:44:11.124,D:\Delphi\StoneNotes\mv.WebService.HomeController.pas=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/11/15 16:06:50.794,=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
-    <Transaction>2023/11/15 16:07:05.276,D:\Delphi\StoneNotes\mv.WebService.PluginController.pas=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
-  </Transactions>  <ProjectSortOrder AutoSort="0" SortType="0">
+    <Transaction>2023/11/15 15:14:52.000.514,=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
+    <Transaction>2023/11/15 15:15:00.000.916,D:\Delphi\StoneNotes\mv.WebService.pas=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
+    <Transaction>2023/11/15 15:44:03.000.171,=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
+    <Transaction>2023/11/15 15:44:11.000.124,D:\Delphi\StoneNotes\mv.WebService.HomeController.pas=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
+    <Transaction>2023/11/15 16:06:50.000.794,=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
+    <Transaction>2023/11/15 16:07:05.000.276,D:\Delphi\StoneNotes\mv.WebService.PluginController.pas=D:\Delphi\StoneNotes\Unit2.pas</Transaction>
+  </Transactions>
+	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="activity-1.1.0.dex.jar"/>
     <File Path="annotation-1.2.0.dex.jar"/>
     <File Path="appcompat-1.2.0.dex.jar"/>

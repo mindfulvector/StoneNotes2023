@@ -19,7 +19,7 @@ uses
 
   {other custom classes}
   mv.SplitterSerializer, mv.PluginManager, mv.Logger, mv.FMX.StyleMaker,
-  mv.StringUtils, mv.WebService;
+  mv.StringUtils, mv.WebService, IdHeaderList;
 
 
 
@@ -52,6 +52,10 @@ type
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
     procedure HttpPluginServicesCommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+    procedure HttpPluginServicesCreatePostStream(AContext: TIdContext;
+      AHeaders: TIdHeaderList; var VPostStream: TStream);
+    procedure HttpPluginServicesDoneWithPostStream(AContext: TIdContext;
+      ARequestInfo: TIdHTTPRequestInfo; var VCanFree: Boolean);
   private
     FSystemIniFile: TMemIniFile;
     FFilename: string;
@@ -84,6 +88,8 @@ implementation
 
 uses
   FMX.Platform, FMX.Platform.Win, Winapi.Messages, Winapi.CommCtrl,
+  System.NetEncoding,
+  IdGlobal,
   mv.WebView.BrowserForm, mv.Process.NameDelphiThreads, mv.Process.UnloadAllModules,
   mv.Process.ProcessCleanup, mv.PluginStorageService;
 
@@ -416,8 +422,7 @@ var
   Path, Query: string;
   Controller, Action: string;
   Res: string;
-label
-  Error404, CheckRes, Done;
+  PostBody: string;
   // This reduces the complexity of adding a route to just adding one line
   // of code to the main CommandGet handler below, similar to a Python/PHP
   // framework.
@@ -426,8 +431,8 @@ label
     // Already sent a response? Skip checking more patterns.
     if '' <> Res then Exit;
 
-    // This is the CommandGet helper, so the method is always GET here
-    Res := WebRoute('GET', CheckPath, Query, CheckPattern);
+    // Command has either GET or POST
+    Res := WebRoute(ARequestInfo.Command, CheckPath, Query, PostBody, CheckPattern);
     if '' <> Res then
     begin
       mv.Logger.Log('WebRequest:Matched> ' + CheckPattern);
@@ -484,6 +489,15 @@ begin
   mv.Logger.Log('WebRequest:Path>        '+Path);
   mv.Logger.Log('WebRequest:Query>       '+Query);
 
+  // Read any post body
+  PostBody := '';
+  if ARequestInfo.Command = 'POST' then
+  begin
+    PostBody := ARequestInfo.FormParams;
+    PostBody := TNetEncoding.URL.Decode(PostBody);
+  end;
+
+
   // Be sure to call the _Route helper, not WebRoute directly!
   // Less specific routes (such as / in particular) MUST be after more specific
   // routes, otherwise they will intercept the more specific route! A route will
@@ -492,6 +506,7 @@ begin
   _Route(Path, 'GET /plugin/ TPluginController->PluginResource');
   _Route(Path, 'GET /assets/ TPluginController->AssetResource');
   _Route(Path, 'GET /Service/PluginStorageService/ReadLayoutValue TPluginController->ReadLayoutValue');
+  _Route(Path, 'POST /Service/PluginStorageService/WriteLayoutValue TPluginController->WriteLayoutValue');
 
   if '' = Res then begin  
     AResponseInfo.ResponseNo := 404;
@@ -576,6 +591,20 @@ begin
   ICC.dwSize := SizeOf(TInitCommonControlsEx);
   ICC.dwICC := ICC_STANDARD_CLASSES;
   InitCommonControlsEx(ICC);
+end;
+
+procedure TfrmStoneNotes.HttpPluginServicesCreatePostStream(
+  AContext: TIdContext; AHeaders: TIdHeaderList; var VPostStream: TStream);
+begin
+  VPostStream := TMemoryStream.Create;
+end;
+
+procedure TfrmStoneNotes.HttpPluginServicesDoneWithPostStream(
+  AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo;
+  var VCanFree: Boolean);
+begin
+  //
+  VCanFree := true;
 end;
 
 initialization

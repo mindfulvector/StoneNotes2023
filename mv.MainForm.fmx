@@ -101,6 +101,8 @@ object frmStoneNotes: TfrmStoneNotes
     DefaultPort = 64767
     AutoStartSession = True
     SessionIDCookieName = 'STONENOTES_SESSID'
+    OnCreatePostStream = HttpPluginServicesCreatePostStream
+    OnDoneWithPostStream = HttpPluginServicesDoneWithPostStream
     OnCommandGet = HttpPluginServicesCommandGet
     Left = 280
     Top = 112

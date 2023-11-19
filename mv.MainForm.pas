@@ -333,10 +333,11 @@ begin
   HomeFilename := FSystemIniFile.ReadString('files', 'home', '');
   LastOpenedFilename := FSystemIniFile.ReadString('files', 'last_opened', '');
 
-  if '' <> HomeFilename then
-    OpenFile(HomeFilename)
-  else if '' <> LastOpenedFilename then
+  if '' <> LastOpenedFilename then
     OpenFile(LastOpenedFilename);
+
+  if ('' <> HomeFilename) and ('' = FFilename) then
+    OpenFile(HomeFilename);
 
   // Attempt to start the HttpPluginService server, first with the deafult
   // port then with random ports until we find one we can bind to.
@@ -527,6 +528,12 @@ var
   style: string;
   TmpStyleFile: string;
 begin
+  if not FileExists(AFilename) then
+  begin
+    ShowMessage('File could not be found: ' + AFilename);
+    Exit;
+  end;
+
   data := TFile.ReadAllText(AFilename);
   FFilename := AFilename;
   FPluginManager.ActiveLayoutFilename := FFilename;

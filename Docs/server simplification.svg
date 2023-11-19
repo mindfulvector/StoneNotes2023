@@ -1,0 +1,801 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="server simplification.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.4778115"
+     inkscape:cx="339.69149"
+     inkscape:cy="639.12075"
+     inkscape:window-width="1727"
+     inkscape:window-height="1247"
+     inkscape:window-x="59"
+     inkscape:window-y="62"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer2" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline;mix-blend-mode:normal"
+     sodipodi:insensitive="true">
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       id="rect1"
+       width="296.66473"
+       height="209.83167"
+       x="0.17903726"
+       y="0.17903726" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2">
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.229256"
+       id="rect2"
+       width="126.2566"
+       height="28.681286"
+       x="8.0157499"
+       y="36.570835" />
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.420489"
+       id="rect3"
+       width="79.699989"
+       height="28.131983"
+       x="8.3687124"
+       y="70.525948" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="10.898009"
+       y="42.317692"
+       id="text3"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="stroke-width:0.264583"
+         x="10.898009"
+         y="42.317692">StoneNotes Instance</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.898009"
+         y="46.286442"
+         id="tspan8">* Main grid interface</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.898009"
+         y="50.255192"
+         id="tspan77">* Layout file JSON serialization and deserialization to restore layout state</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.898009"
+         y="54.223942"
+         id="tspan7">* IdHTTPServer:</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.898009"
+         y="58.192692"
+         id="tspan9">   - Currently supposed to provide PluginStorageService and other services</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="10.439201"
+       y="75.640076"
+       id="text4"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="stroke-width:0.264583"
+         x="10.439201"
+         y="75.640076">Deno server</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.439201"
+         y="79.608826"
+         id="tspan5">server.ts HTTP server</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.439201"
+         y="83.577576"
+         id="tspan10">- Currently Plugin resource server</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.439201"
+         y="87.546326"
+         id="tspan11">- But doesn't know what instance it belongs to</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.439201"
+         y="91.515076"
+         id="tspan12">- No access to the layout storage file, so it must</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="10.439201"
+         y="95.483826"
+         id="tspan18">communicate with StoneNotes instance anyway</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.250665"
+       id="rect13"
+       width="35.208294"
+       height="29.131565"
+       x="98.233452"
+       y="70.38179" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="100.51918"
+       y="75.959076"
+       id="text13"><tspan
+         sodipodi:role="line"
+         id="tspan13"
+         style="stroke-width:0.264583"
+         x="100.51918"
+         y="75.959076">Static file storage</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="100.51918"
+         y="79.927826"
+         id="tspan14">- Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="100.51918"
+         y="83.896576"
+         id="tspan15">- Assets</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="100.51918"
+         y="87.865326"
+         id="tspan16">- Plugins</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="100.51918"
+         y="91.834076"
+         id="tspan17">- Support?</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="6.2992024"
+       y="127.61742"
+       id="text19"><tspan
+         sodipodi:role="line"
+         id="tspan19"
+         style="stroke-width:0.264583"
+         x="6.2992024"
+         y="127.61742">Why even have a persistent Deno server? It just makes the situation more complex</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="6.2992024"
+         y="131.58617"
+         id="tspan20">and causes issues with process management, server monitoring, and communication</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="6.2992024"
+         y="135.55492"
+         id="tspan21">to the correct instance and storage in the correct layout file.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="55.19693"
+       y="24.306906"
+       id="text22"><tspan
+         sodipodi:role="line"
+         id="tspan22"
+         style="stroke-width:0.264583"
+         x="55.19693"
+         y="24.306906">Current situation</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="208.12787"
+       y="25.572891"
+       id="text23"><tspan
+         sodipodi:role="line"
+         id="tspan23"
+         style="stroke-width:0.264583"
+         x="208.12787"
+         y="25.572891">Simplified situation</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.332081"
+       id="rect23"
+       width="126.15378"
+       height="60.228077"
+       x="157.70654"
+       y="36.622246" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="160.5374"
+       y="42.317692"
+       id="text27"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="42.317692"
+         id="tspan25">StoneNotes Instance</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="46.286442"
+         id="tspan82">* Main grid interface</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="50.255192"
+         id="tspan83">* Layout file JSON serialization and deserialization to restore layout state</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="54.223942"
+         id="tspan26">* IdHTTPServer:</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="58.192692"
+         id="tspan27">   - Still PluginStorageService, etc.</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="62.161442"
+         id="tspan28">   - Also static file hosting</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="66.130188"
+         id="tspan29">   - Directly handle execution of Deno when a .ts file is requested</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="70.098938"
+         id="tspan30">   - Typescript Services can be in Services or can be in a Plugin</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="160.5374"
+         y="74.067688"
+         id="tspan31">   - Typescript Services can communicate with the instance via STDIO</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.250665"
+       id="rect36"
+       width="35.208294"
+       height="29.131565"
+       x="247.61964"
+       y="106.84215" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="249.90536"
+       y="112.41943"
+       id="text40"><tspan
+         sodipodi:role="line"
+         id="tspan36"
+         style="stroke-width:0.264583"
+         x="249.90536"
+         y="112.41943">Static file storage</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="249.90536"
+         y="116.38818"
+         id="tspan37">- Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="249.90536"
+         y="120.35693"
+         id="tspan38">- Assets</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="249.90536"
+         y="124.32568"
+         id="tspan39">- Plugins</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="249.90536"
+         y="128.29443"
+         id="tspan40">- Support?</tspan></text>
+    <g
+       id="g45"
+       transform="translate(-0.08951863,1.2532609)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 1.265984,-0.759589 -1.519182,0.822891 1.329285,0.696291 z"
+         id="path43" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.375232"
+         d="m 97.723946,85.054316 -8.863665,-0.02772"
+         id="path44"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 97.703481,85.0267 -1.542448,-0.747161 1.850938,0.809427 -1.619571,0.684899 z"
+         id="path45" />
+    </g>
+    <g
+       id="g48"
+       transform="matrix(0.00300203,0.93620071,-1.0082132,0.00278761,353.18079,14.11204)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 1.265984,-0.759589 -1.519182,0.822891 1.329285,0.696291 z"
+         id="path46" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.375232"
+         d="m 97.723946,85.054316 -8.863665,-0.02772"
+         id="path47"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 97.703481,85.0267 -1.542448,-0.747161 1.850938,0.809427 -1.619571,0.684899 z"
+         id="path48" />
+    </g>
+    <g
+       id="g51"
+       transform="matrix(0.00325332,0.41852918,-1.0926088,0.0012462,134.02938,28.95774)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 1.265984,-0.759589 -1.519182,0.822891 1.329285,0.696291 z"
+         id="path49" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.375232"
+         d="m 97.723946,85.054316 -8.863665,-0.02772"
+         id="path50"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 97.703481,85.0267 -1.542448,-0.747161 1.850938,0.809427 -1.619571,0.684899 z"
+         id="path51" />
+    </g>
+    <g
+       id="g54"
+       transform="matrix(0.00325332,0.41852918,-1.0926088,0.0012462,203.85391,28.599665)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 1.265984,-0.759589 -1.519182,0.822891 1.329285,0.696291 z"
+         id="path52" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.375232"
+         d="m 97.723946,85.054316 -8.863665,-0.02772"
+         id="path53"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 97.703481,85.0267 -1.542448,-0.747161 1.850938,0.809427 -1.619571,0.684899 z"
+         id="path54" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="91.308998"
+       y="63.737263"
+       id="text54"><tspan
+         sodipodi:role="line"
+         id="tspan54"
+         style="stroke-width:0.264583"
+         x="91.308998"
+         y="63.737263">Generates _eval.html files</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="9.1309004"
+       y="64.18486"
+       id="text55"><tspan
+         sodipodi:role="line"
+         id="tspan55"
+         style="stroke-width:0.264583"
+         x="9.1309004"
+         y="64.18486">Monitors and receives commands from Deno</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="240.442"
+       y="90.829338"
+       id="text56"><tspan
+         sodipodi:role="line"
+         id="tspan56"
+         style="stroke-width:0.264583"
+         x="240.442"
+         y="90.829338">Generates _eval.html files</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="240.442"
+         y="94.798088"
+         id="tspan57">Retrieves files for serving</tspan></text>
+    <path
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.0839609;stroke-dasharray:0.167922, 0.0839609;stroke-dashoffset:0"
+       d="m 144.99374,29.539407 c 0.0529,104.976193 0.0529,104.976193 0.0529,104.976193 v 0.12207"
+       id="path57" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.265;stroke-dasharray:none;stroke-dashoffset:0"
+       x="270.88339"
+       y="5.7291927"
+       id="text58"><tspan
+         sodipodi:role="line"
+         id="tspan58"
+         style="stroke-width:0.265;stroke-dasharray:none;stroke-dashoffset:0"
+         x="270.88339"
+         y="5.7291927">2023-11-13</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.303438;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect58"
+       width="58.506748"
+       height="19.297585"
+       x="8.4339705"
+       y="103.86082" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="10.384161"
+       y="107.95947"
+       id="text59"><tspan
+         sodipodi:role="line"
+         id="tspan59"
+         style="stroke-width:0.265"
+         x="10.384161"
+         y="107.95947">Transitory Deno processes</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.265"
+         x="10.384161"
+         y="111.92822"
+         id="tspan61">- Execute Typescript Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.265"
+         x="10.384161"
+         y="115.89697"
+         id="tspan62">- CGI-like</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.265"
+         x="10.384161"
+         y="119.86572"
+         id="tspan63">- JSON STDIN and JSON STDOUT</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.303438;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect63"
+       width="58.506748"
+       height="19.297585"
+       x="157.93008"
+       y="103.50275" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="159.88028"
+       y="107.60139"
+       id="text67"><tspan
+         sodipodi:role="line"
+         id="tspan64"
+         style="stroke-width:0.265"
+         x="159.88028"
+         y="107.60139">Transitory Deno processes</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.265"
+         x="159.88028"
+         y="111.57014"
+         id="tspan65">- Execute Typescript Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.265"
+         x="159.88028"
+         y="115.53889"
+         id="tspan66">- CGI-like</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.265"
+         x="159.88028"
+         y="119.50764"
+         id="tspan67">- JSON STDIN and JSON STDOUT</tspan></text>
+    <g
+       id="g69"
+       transform="matrix(0.00325332,0.41852918,-1.0926088,0.0012462,132.77612,62.079634)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 1.265984,-0.759589 -1.519182,0.822891 1.329285,0.696291 z"
+         id="path67" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.375232"
+         d="m 97.723946,85.054316 -8.863665,-0.02772"
+         id="path68"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 97.703481,85.0267 -1.542448,-0.747161 1.850938,0.809427 -1.619571,0.684899 z"
+         id="path69" />
+    </g>
+    <g
+       id="g72"
+       transform="matrix(0.00325332,0.41852918,-1.0926088,0.0012462,276.36401,61.00541)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 1.265984,-0.759589 -1.519182,0.822891 1.329285,0.696291 z"
+         id="path70" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.375232"
+         d="m 97.723946,85.054316 -8.863665,-0.02772"
+         id="path71"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 97.703481,85.0267 -1.542448,-0.747161 1.850938,0.809427 -1.619571,0.684899 z"
+         id="path72" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+       x="158.98006"
+       y="82.951698"
+       id="text73"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="158.98006"
+         y="82.951698"
+         id="tspan73">- Executes Deno temp. process, passing in</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="158.98006"
+         y="86.920448"
+         id="tspan74">request JSON and retrieving result JSON</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="158.98006"
+         y="90.889198"
+         id="tspan75">- Process commands from external process</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="158.98006"
+         y="94.857948"
+         id="tspan76">via JSON response</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="189.42143"
+       y="45.475464"
+       id="text80"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.265"
+         x="189.42143"
+         y="45.475464"
+         id="tspan81" /></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.455744;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect90"
+       width="123.16594"
+       height="65.694969"
+       x="4.2132306"
+       y="142.78807" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="6.2663045"
+       y="148.06383"
+       id="text91"><tspan
+         sodipodi:role="line"
+         id="tspan91"
+         style="stroke-width:0.265"
+         x="6.2663045"
+         y="148.06383">mv.MainForm</tspan></text>
+    <path
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.124089;stroke-dasharray:0.248179, 0.124089;stroke-dashoffset:0"
+       d="m 4.7408246,139.56384 c 287.2072654,0.17019 287.2072654,0.17019 287.2072654,0.17019 l 0.33398,1.6e-4"
+       id="path84" />
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.293982;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect86"
+       width="62.096951"
+       height="54.219307"
+       x="7.5340581"
+       y="150.76387" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="9.6680126"
+       y="156.1205"
+       id="text86"><tspan
+         sodipodi:role="line"
+         id="tspan86"
+         style="stroke-width:0.265"
+         x="9.6680126"
+         y="156.1205">mv.TSplitterPanel</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.249045;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect84"
+       width="55.517509"
+       height="43.522011"
+       x="10.734259"
+       y="158.79807" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="13.785868"
+       y="163.99814"
+       id="text84"><tspan
+         sodipodi:role="line"
+         id="tspan84"
+         style="stroke-width:0.265"
+         x="13.785868"
+         y="163.99814">mv.TBufferPanel</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.194597;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect85"
+       width="46.978168"
+       height="31.401926"
+       x="13.750669"
+       y="166.11137" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="15.75528"
+       y="171.15962"
+       id="text85"><tspan
+         sodipodi:role="line"
+         id="tspan85"
+         style="stroke-width:0.265"
+         x="15.75528"
+         y="171.15962">mv.WebView.BrowserForm</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.321604;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect87"
+       width="65.292"
+       height="61.71125"
+       x="135.20143"
+       y="142.54196" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="140.54425"
+       y="147.70575"
+       id="text87"><tspan
+         sodipodi:role="line"
+         id="tspan87"
+         style="stroke-width:0.265"
+         x="140.54425"
+         y="147.70575">mv.TPluginManager</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.249045;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect88"
+       width="55.517509"
+       height="43.522011"
+       x="138.38783"
+       y="156.82864" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="142.89532"
+       y="162.85161"
+       id="text88"><tspan
+         sodipodi:role="line"
+         id="tspan88"
+         style="stroke-width:0.265"
+         x="142.89532"
+         y="162.85161">mv.TPlugin</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.194597;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect89"
+       width="46.978168"
+       height="31.401926"
+       x="143.30321"
+       y="164.58505" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="145.64682"
+       y="169.27972"
+       id="text89"><tspan
+         sodipodi:role="line"
+         id="tspan89"
+         style="stroke-width:0.265"
+         x="145.64682"
+         y="169.27972">mv.TPluginService</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.265"
+         x="145.64682"
+         y="173.24847"
+         id="tspan90">mv.TPluginStorageService</tspan></text>
+    <rect
+       style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.267082;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect91"
+       width="51.739689"
+       height="53.709099"
+       x="71.615952"
+       y="150.92944" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264999;stroke-dasharray:none;stroke-dashoffset:0"
+       x="73.763351"
+       y="156.29953"
+       id="text92"><tspan
+         sodipodi:role="line"
+         id="tspan92"
+         style="stroke-width:0.265"
+         x="73.763351"
+         y="156.29953">HttpServer: TIdHTTPServer</tspan></text>
+    <g
+       id="g94"
+       transform="matrix(2.563755,0,0,0.85898462,-107.01356,99.181284)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 0.427126,-0.65619 -0.680324,0.719492 0.647137,0.877239 z"
+         id="path92"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.369972"
+         d="m 97.723868,85.054335 -8.974128,0.02394"
+         id="path93"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 97.703481,85.0267 -0.565317,-0.592062 0.873807,0.654328 -0.79915,0.633199 z"
+         id="path94"
+         sodipodi:nodetypes="ccccc" />
+    </g>
+    <g
+       id="g97"
+       transform="matrix(2.563755,0,0,0.85898462,-165.55875,89.155197)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 0.427126,-0.65619 -0.680324,0.719492 0.647137,0.877239 z"
+         id="path95"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.430805"
+         d="m 119.38623,84.987861 -30.645676,0.0095"
+         id="path96"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 119.52949,84.953009 -0.56532,-0.592062 0.87381,0.654328 -0.79915,0.633199 z"
+         id="path97"
+         sodipodi:nodetypes="ccccc" />
+    </g>
+    <g
+       id="g100"
+       transform="matrix(1.606433,0,0,0.913714,-83.535163,92.372802)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 0.427126,-0.65619 -0.680324,0.719492 0.647137,0.877239 z"
+         id="path98"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.369972"
+         d="m 97.723868,85.054335 -8.974128,0.02394"
+         id="path99"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 97.703481,85.0267 -0.565317,-0.592062 0.873807,0.654328 -0.79915,0.633199 z"
+         id="path100"
+         sodipodi:nodetypes="ccccc" />
+    </g>
+    <g
+       id="g103"
+       transform="matrix(3.5177145,0,0,0.81445557,-282.20713,77.370046)">
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.264583"
+         d="m 88.872122,85.010867 0.427126,-0.65619 -0.680324,0.719492 0.647137,0.877239 z"
+         id="path101"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.430805"
+         d="m 119.38623,84.987861 -30.645676,0.0095"
+         id="path102"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f9f9f9;stroke:#1a1a1a;stroke-width:0.289648"
+         d="m 119.52949,84.953009 -0.56532,-0.592062 0.87381,0.654328 -0.79915,0.633199 z"
+         id="path103"
+         sodipodi:nodetypes="ccccc" />
+    </g>
+  </g>
+</svg>

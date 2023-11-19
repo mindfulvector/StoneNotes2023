@@ -1,0 +1,110 @@
+object frmStoneNotes: TfrmStoneNotes
+  Left = 0
+  Top = 0
+  Caption = 'StoneNotes Matrix'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnClose = FormClose
+  OnDeactivate = FormDeactivate
+  OnKeyDown = FormKeyDown
+  OnMouseMove = FormMouseMove
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object btnSplitRight: TButton
+    Position.X = 355.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Spli&t ->'
+    OnClick = btnSplitRightClick
+  end
+  object btnSplitLeft: TButton
+    Position.X = 285.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = '<- Sp&lit'
+    OnClick = btnSplitLeftClick
+  end
+  object btnSave: TButton
+    Position.X = 75.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    Text = '&Save'
+    OnClick = btnSaveClick
+  end
+  object btnOpen: TButton
+    Position.X = 215.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    Text = '&Open...'
+    OnClick = btnOpenClick
+  end
+  object saveDlg: TSaveDialog
+    Left = 440
+    Top = 112
+  end
+  object openDlg: TOpenDialog
+    Left = 368
+    Top = 112
+  end
+  object btnSaveAs: TButton
+    Position.X = 145.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Text = '&Save As...'
+    OnClick = btnSaveAsClick
+  end
+  object btnNew: TButton
+    Position.X = 5.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    Text = '&New'
+    OnClick = btnNewClick
+  end
+  object btnStyle: TButton
+    Position.X = 425.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'S&tyle'
+    OnClick = btnStyleClick
+  end
+  object HttpPluginServices: TIdHTTPServer
+    Bindings = <
+      item
+        IP = '127.0.0.1'
+        Port = 64767
+      end>
+    DefaultPort = 64767
+    AutoStartSession = True
+    SessionIDCookieName = 'STONENOTES_SESSID'
+    OnCreatePostStream = HttpPluginServicesCreatePostStream
+    OnDoneWithPostStream = HttpPluginServicesDoneWithPostStream
+    OnCommandGet = HttpPluginServicesCommandGet
+    Left = 280
+    Top = 112
+  end
+end

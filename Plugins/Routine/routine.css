@@ -1,0 +1,93 @@
+html, body {
+    background: #007EA7 !important;
+}
+body {
+    padding: 10px;
+}
+body * {
+    font-size: 12px;
+}
+.draghandle {
+    width: 100%;
+    height: 15px;    
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+#routineList {
+    margin-top: 20px;
+    background: #007EA7;
+}
+.routineStep {
+    background-color: #00A7E1;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    height: 65px;
+    width: 90%;
+    max-width: 600px;
+    font-family: Arial, sans-serif;
+    border-radius: 5px;
+    margin-bottom:20px;
+}
+.routineStep .draghandle {
+    flex-direction: row;
+}
+.routineStep .draghandle .title {
+    padding: 5px 0px 0 5px;
+    font-weight: bold;
+}
+.routineStep .draghandle .delete-item {
+    float:right;
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 10px;
+    cursor: pointer;
+    outline: none;
+    font-weight: bold;
+}
+.routineStep .done-btn {
+    display: inline-block;
+    margin: 5px 0 2px 5px;
+    border: 1px solid grey;
+    border-radius: 5px;
+}
+.routineStep .not-done svg * {
+    stroke: #FFF;
+}
+.routineStep .done svg * {
+    stroke: #A4AF69;
+}
+.routineStep .body {
+    display: inline-block;
+    margin: 10px 10px 10px 10px;
+}
+.routineStep .body[contenteditable="true"]:focus {
+    outline: none;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+}
+
+body h1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #FFF;
+    flex-basis: 50%;
+    display: inline-flex;
+}
+header button {
+    flex-basis: 25%;
+    margin: 5px;
+    padding: 2px 4px;
+    background-color: #4CAF50;  /* Green color for the button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 12px;
+}
+
+header button:hover {
+    background-color: #388E3C;  /* Darker green on hover */
+}

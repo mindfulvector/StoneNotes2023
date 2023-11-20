@@ -123,23 +123,25 @@ var
 begin
   RGBtoHSL(AColor, H, S, L);
 
+  (*
   // If the color is dark (e.g., L < 0.5), then we lighten it.
   // Otherwise, we darken it.
   if L < 0.5 then
   begin
     L := L + Amount;
     if L > 1 then L := 1;
-
-    // Adding a random color variation
-    RandomShift := Random * 0.1; // Vary hue by up to 10%
-    H := H + RandomShift;
-    if H > 1 then H := H - 1; // Wrap around if hue goes beyond 1
   end
   else
   begin
     L := L - Amount;
     if L < 0 then L := 0;
   end;
+  *)
+
+  // Randomly vary the hue by +/- 50%
+  H := H + (-0.5 + Random * 0.5);
+  if H > 1.0 then H := H - 1; // Wrap around if hue goes beyond 1.0
+  if H < 0.0 then H := H + 1; // Wrap around if hue goes below 0.0
 
   Result := HSLtoRGB(H, S, L);
 end;
@@ -175,7 +177,7 @@ begin
           NewColorString := AlphaColorToString(OriginalColor).Replace('#0', 'x');
 
           // Modify the color
-          NewColor := AdjustColor(OriginalColor, 0.1+Random*0.4);
+          NewColor := AdjustColor(OriginalColor, 0.1+Random*0.1);
           NewColorString := AlphaColorToString(NewColor).Replace('#', 'x');
           if Length(NewColorString) > Length(OriginalColorString) then
           begin

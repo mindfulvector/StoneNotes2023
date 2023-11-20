@@ -504,10 +504,11 @@ begin
   // routes, otherwise they will intercept the more specific route! A route will
   // accept anything added to the end of it if no other route has accepted the
   // request already, in order to support parameters, etc.
-  _Route(Path, 'GET /plugin/ TPluginController->PluginResource');
+  _Route(Path, 'GET /plugins/ TPluginController->PluginResource');
   _Route(Path, 'GET /assets/ TPluginController->AssetResource');
-  _Route(Path, 'GET /Service/PluginStorageService/ReadLayoutValue TPluginController->ReadLayoutValue');
-  _Route(Path, 'POST /Service/PluginStorageService/WriteLayoutValue TPluginController->WriteLayoutValue');
+  _Route(Path, 'GET /Services/Storage/ReadLayoutValue TPluginController->ReadLayoutValue');
+  _Route(Path, 'POST /Services/Storage/WriteLayoutValue TPluginController->WriteLayoutValue');
+  _Route(Path, 'POST /Services/Dialogs/Alert TPluginController->DialogAlert');
 
   if '' = Res then begin  
     AResponseInfo.ResponseNo := 404;

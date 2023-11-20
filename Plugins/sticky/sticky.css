@@ -1,5 +1,6 @@
 body {
     padding: 10px;
+    background: #C9AD86;
 }
 body h1 {
     font-size: 12px;
@@ -28,7 +29,7 @@ body * {
     background: none;
     border: none;
     color: #000;
-    font-size: 8px; /* Adjust as necessary */
+    font-size: 8px;
     cursor: pointer;
     outline: none;
     font-weight: bold;

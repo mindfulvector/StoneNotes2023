@@ -410,7 +410,7 @@ begin
 
   if Assigned(FWindowChild) then
   begin
-    FWindowChild.Left := Round(AbsolutePos.X + frmStoneNotes.Left + TSplitterPanel(Self.Owner).LocalToAbsolute(PointF(0, 0)).X + 5);
+    FWindowChild.Left := Round(frmStoneNotes.Left + TSplitterPanel(Self.Owner).LocalToAbsolute(PointF(0, 0)).X + 5);
     FWindowChild.Top := Round(Self.Top + frmStoneNotes.Top + TSplitterPanel(Self.Owner).LocalToAbsolute(PointF(0, 0)).Y + FGoButton.Position.Y + FGoButton.Height + 45);
     FWindowChild.Width := Round(Self.Width) - 5;
     FWindowChild.Height := Round(Self.Height - FGoButton.Position.Y - FGoButton.Height - 10);

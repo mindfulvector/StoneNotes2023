@@ -172,7 +172,7 @@ begin
   *)
 
   // Setup URL to the prepared HTML file via the Deno service.
-  FileURL := 'http://127.0.0.1:' + IntToStr(WebPort) + '/plugin/'
+  FileURL := 'http://127.0.0.1:' + IntToStr(WebPort) + '/plugins/'
                       +Self.DirName
                       +'/'
                       +PluginPage
